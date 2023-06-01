@@ -40,7 +40,7 @@ function TaskCard({ task, ind, groupInd }: Props) {
   }
   return (
     <Box m="auto">
-      <Card m="2" _hover={{ color: "blue" }}>
+      <Card m="2" _hover={{ color: "blue" }}  onClick={modal} cursor="pointer">
         {task.tags.length ? (
           <CardHeader display="flex" flexDirection="row" p="2">
             {task.tags.map((tag) => (
@@ -50,7 +50,7 @@ function TaskCard({ task, ind, groupInd }: Props) {
             ))}
           </CardHeader>
         ) : null}
-        <CardBody p={2}  onClick={modal} cursor="pointer">
+        <CardBody p={2}>
           <Heading m={0} size="md">
             {task.name}
           </Heading>
@@ -64,7 +64,10 @@ function TaskCard({ task, ind, groupInd }: Props) {
               _hover={{
                 background: "gray.100",
               }}
-              onClick={() => setOpen(!progessOpen)}  cursor="pointer"
+              onClick={(e) => {
+                e.stopPropagation()
+                setOpen(!progessOpen)
+              }}  cursor="pointer"
             >
               {task.subtasks.length ? (
                 <Progress
