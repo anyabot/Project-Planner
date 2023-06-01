@@ -44,7 +44,7 @@ function TaskCard({ task, ind, groupInd }: Props) {
         {task.tags.length ? (
           <CardHeader display="flex" flexDirection="row" p="2">
             {task.tags.map((tag) => (
-              <Tag colorScheme={tags[tag].color} px="5px" mx="5px">
+              <Tag key={`tag${tag}`} colorScheme={tags[tag].color} px="5px" mx="5px">
                 {tags[tag].name}
               </Tag>
             ))}

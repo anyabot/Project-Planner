@@ -236,7 +236,7 @@ function TaskGroup({ group, ind }: Props) {
                   {group.tasks.map((item, index) => (
                     <Box key={index}>
                       <Draggable
-                        key={index}
+                        key={item.id}
                         draggableId={item.id.toString()}
                         index={index}
                       >
