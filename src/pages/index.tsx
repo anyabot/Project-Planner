@@ -87,7 +87,6 @@ export default function Home() {
     }
   }
   return (
-    <Flex>
       <DragDropContext onDragEnd={onDragEnd}>
         {winReady ? (
             <Box display="flex" flexDirection="row" width="100%">
@@ -101,6 +100,5 @@ export default function Home() {
             </Box>
         ) : null}
       </DragDropContext>
-    </Flex>
   );
 }

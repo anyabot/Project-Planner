@@ -33,22 +33,25 @@ import {
   Tab,
   TabPanel,
   Flex,
-  Spacer
+  Spacer,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import HeartBeatIcon from "../../icons/heartbeat.svg";
 import { useAppSelector, useAppDispatch } from "@/hooks";
-import { selectGroups, setGroups, addItem, addGroup, addGroupLast, setGroupColor } from "@/store/stateSlice";
+import {
+  selectGroups,
+  setGroups,
+  addItem,
+  addGroup,
+  addGroupLast,
+  setGroupColor,
+} from "@/store/stateSlice";
 import TaskCard from "./taskCard";
-const iconTypes: { [key: string]: any } = {
-  heartbeat: HeartBeatIcon,
-};
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: "none",
   padding: grid / 2,
-
 
   // styles we need to apply on draggables
   ...draggableStyle,
@@ -60,12 +63,20 @@ const getListStyle = (isDraggingOver: boolean) => ({
 
 const grid = 8;
 
-const colorList = ["red", "orange", "yellow", "green", "teal", "blue", "cyan", "gray"]
+const colorList = [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "teal",
+  "blue",
+  "cyan",
+  "gray",
+];
 
 function TaskGroup({ group, ind }: Props) {
   const dispatch = useAppDispatch();
   const state = useAppSelector(selectGroups);
-  let Icon = iconTypes[group.icon];
   const addNewItem = function (index: number) {
     if (index < 0 || index >= state.length) return;
     dispatch(addItem(index));
@@ -88,7 +99,7 @@ function TaskGroup({ group, ind }: Props) {
     setIsHovering(false);
   };
   return (
-    <Box position="relative">
+    <Box position="relative" height="100%">
       <Box
         w="30px"
         h="30px"
@@ -113,14 +124,15 @@ function TaskGroup({ group, ind }: Props) {
           </Circle>
         )}
       </Box>
-      {ind == state.length - 1 &&       <Box
-        w="30px"
-        h="30px"
-        position="absolute"
-        transform="translateY(-50%) translateX(50%)"
-        right="-30px"
-        top="30px"
-      >
+      {ind == state.length - 1 && (
+        <Box
+          w="30px"
+          h="30px"
+          position="absolute"
+          transform="translateY(-50%) translateX(50%)"
+          right="-30px"
+          top="30px"
+        >
           <Circle
             size="30px"
             bg="gray.700"
@@ -132,117 +144,124 @@ function TaskGroup({ group, ind }: Props) {
           >
             <AddIcon />
           </Circle>
-      </Box>}
-      <Box minW="320px">
-        <Droppable droppableId={`${ind}`}>
-          {(provided, snapshot) => (
-            <Box
-              ref={provided.innerRef}
-              width="320px"
-              bg="gray.200"
-              {...provided.droppableProps}
-            >
-              <Heading
-                size="md"
-                flexDirection="row"
-                display="flex"
-                color="white"
-                backgroundColor={group.color+".400"}
-                height="60px"
-                p={2}
-                alignItems="center"
-                px={8}
-              >
-                <Box mx="2">
-                  <Icon width="23px" />
-                </Box>
-                <Editable defaultValue={group.name} width="100%">
-                  <EditablePreview />
-                  <EditableInput />
-                </Editable>
-                <Popover>
-                  <PopoverTrigger>
-                    <ChevronDownIcon color="white" cursor="pointer" />
-                  </PopoverTrigger>
-                  <PopoverContent color="black">
-                    <PopoverArrow />
-                    <Tabs>
-                      <TabList>
-                        <Tab>Appearance</Tab>
-                        <Tab>Automations</Tab>
-                      </TabList>
-
-                      <TabPanels>
-                        <TabPanel>
-                          <Flex flexDirection="row" width="100%" justifyContent="center" alignItems="center">
-                          {colorList.map((color) => (
-                            <>
-                            <Circle key={color} bg={color} cursor="pointer" size={group.color == color ? "25px" : "15px"} onClick={() => setColor(color)}/>
-                            <Spacer />
-                            </>
-                          ))}
-                          </Flex>
-                        </TabPanel>
-                        <TabPanel>
-                          <p>two!</p>
-                        </TabPanel>
-                      </TabPanels>
-                    </Tabs>
-                  </PopoverContent>
-                </Popover>
-                <Circle size="25px" float="right" bg={group.color+".500"}>
-                  {group.tasks.length}
-                </Circle>
-              </Heading>
-              <Box overflowY="scroll" py={2} height="100%" maxH="740px" minH="740px" __css={{
-              '&::-webkit-scrollbar': {
-                w: '2',
-              },
-              '&::-webkit-scrollbar-track': {
-                w: '3',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                borderRadius: '5',
-                bg: `gray.100`,
-              },
-            }}>
-                {group.tasks.map((item, index) => (
-                  <Box key={index}>
-                  <Draggable
-                    key={index}
-                    draggableId={item.id.toString()}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        )}
+        </Box>
+      )}
+      <Box minW="320px" height="100%">
+        <Box height="100%" backgroundColor={group.color + ".300"}>
+          <Heading
+            size="md"
+            flexDirection="row"
+            display="flex"
+            color="white"
+            backgroundColor={group.color + ".400"}
+            height="60px"
+            p={2}
+            alignItems="center"
+            m={0}
+          >
+            <Circle size="25px" float="right" bg={group.color + ".300"} m={2}>
+              {group.tasks.length}
+            </Circle>
+            <Editable defaultValue={group.name} width="100%" overflow="hidden">
+              <EditablePreview />
+              <EditableInput />
+            </Editable>
+            <Popover>
+              <PopoverTrigger>
+                <ChevronDownIcon color="white" cursor="pointer" />
+              </PopoverTrigger>
+              <PopoverContent color="black">
+                <PopoverArrow />
+                <Tabs>
+                  <TabList>
+                    <Tab>Appearance</Tab>
+                    <Tab>Automations</Tab>
+                  </TabList>
+                  {/* Color Picker */}
+                  <TabPanels>
+                    <TabPanel>
+                      <Flex
+                        flexDirection="row"
+                        width="100%"
+                        justifyContent="center"
+                        alignItems="center"
                       >
-                        <TaskCard task={item} ind={index}/>
-                      </div>
-                    )}
-                  </Draggable>
-                  </Box>
-                ))}
-                {provided.placeholder}
+                        {colorList.map((color) => (
+                          <>
+                            <Circle
+                              key={color}
+                              bg={color}
+                              cursor="pointer"
+                              size={group.color == color ? "25px" : "15px"}
+                              onClick={() => setColor(color)}
+                            />
+                            <Spacer />
+                          </>
+                        ))}
+                      </Flex>
+                    </TabPanel>
+                    <TabPanel>
+                      <p>two!</p>
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </PopoverContent>
+            </Popover>
 
-                <Button
-                  colorScheme="blue"
-                  onClick={() => addNewItem(ind)}
-                  margin="auto"
-                  display="block"
+          </Heading>
+          <Button
+            bg={group.color + ".300"}
+            _hover={{ bg: group.color + ".400" }}
+            onClick={() => addNewItem(ind)}
+            margin="auto"
+            display="block"
+            width="100%"
+          >
+            Add Item
+          </Button>
+          <Droppable droppableId={`${ind}`}>
+            {(provided, snapshot) => (
+              <Box
+                ref={provided.innerRef}
+                width="320px"
+                height="calc(100% - 100px)"
+                {...provided.droppableProps}
+              >
+                {/* Scroller for overflow */}
+                <Box
+                  overflowY="scroll"
+                  height="-webkit-fill-available"
+                  className="scroller"
                 >
-                  Add Item
-                </Button>
+                  {group.tasks.map((item, index) => (
+                    <Box key={index}>
+                      <Draggable
+                        key={index}
+                        draggableId={item.id.toString()}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(
+                              snapshot.isDragging,
+                              provided.draggableProps.style
+                            )}
+                          >
+                            <TaskCard task={item} ind={index} groupInd = {ind} />
+                          </div>
+                        )}
+                      </Draggable>
+                    </Box>
+                  ))}
+                  {provided.placeholder}
+                </Box>
               </Box>
-            </Box>
-          )}
-        </Droppable>
+            )}
+          </Droppable>
+        </Box>
       </Box>
     </Box>
   );

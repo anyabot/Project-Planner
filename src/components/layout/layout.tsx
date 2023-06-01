@@ -5,30 +5,17 @@ import Navbar from './navbar'
 interface Props {
   children: ReactNode
 }
-import TaskModal from '../taskModal'
-import RightBar from './rightbar'
+import TaskModal from '../modal/taskModal'
 
 export default function Layout({children}: Props) {
   return (
     <>
       <Navbar />
       <TaskModal/>
-      <Container w="100%" minW="100%" minH="100%" p={0} display="flex" flexDirection="row">
-        <Box w="100%" overflow="scroll"   __css={{
-              '&::-webkit-scrollbar': {
-                w: '2',
-              },
-              '&::-webkit-scrollbar-track': {
-                w: '3',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                borderRadius: '5',
-                bg: `gray.100`,
-              },
-            }}>
+      <Container w="100%" minW="100%" minH="100%" p={0} display="flex" flexDirection="row" height="calc(100vh - 72px)">
+        <Box w="100%" height="100%" overflow="scroll"   className='scroller fill'>
           {children}
           </Box>
-          <RightBar/>
         </Container>
     </>
   )
