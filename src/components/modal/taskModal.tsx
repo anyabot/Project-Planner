@@ -27,6 +27,7 @@ import {
   SlideFade,
   Tooltip,
   Stack,
+  Button
 } from "@chakra-ui/react";
 
 import { useAppSelector, useAppDispatch } from "@/hooks";
@@ -69,11 +70,10 @@ export default function TaskModal() {
 
     return isEditing ? (
       <ButtonGroup size="sm" spacing={2} mt={2}>
-        <IconButton icon={<CheckIcon />} {...getSubmitButtonProps()} />
-        <IconButton
-          icon={<CloseIcon boxSize={3} />}
+        <Button {...getSubmitButtonProps()}><CheckIcon /></Button>
+        <Button
           {...getCancelButtonProps()}
-        />
+        ><CloseIcon /></Button>
       </ButtonGroup>
     ) : null;
   }

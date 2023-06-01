@@ -55,10 +55,11 @@ function TaskCard({ task, ind, groupInd }: Props) {
             {task.name}
           </Heading>
         </CardBody>
-        <CardFooter p="2">
+        <CardFooter p="2" flexDirection="column">
           <>
             <Box
-              display="contents"
+              display="flex"
+              flexDirection="row"
               color="gray"
               _hover={{
                 background: "gray.100",
