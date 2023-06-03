@@ -118,3 +118,14 @@ a {
 .fill>div {
   height: 100%
 }
+
+.tabLink {
+  color: white;
+  cursor: pointer;
+  display: block;
+  line-height: 20px;
+  max-width: 400px;
+  overflow: hidden;
+  padding: 10px 34px 6px 14px;
+  text-overflow: ellipsis;
+}

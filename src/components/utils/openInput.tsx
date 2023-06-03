@@ -1,23 +1,20 @@
+//Import Components
+import {
+  Box,
+  Button,
+  useOutsideClick,
+  Input,
+} from "@chakra-ui/react";
+
+//Import Hooks
 import React, { useRef, useState, ReactNode } from "react";
+
+// TS type for prop
 interface Props {
   placeholder: string;
   callback: (a: string) => void;
   children: ReactNode;
 }
-import {
-  Checkbox,
-  Box,
-  useEditableControls,
-  Button,
-  useOutsideClick,
-  Input,
-  EditableInput,
-} from "@chakra-ui/react";
-
-import { useAppSelector, useAppDispatch } from "@/hooks";
-import { selectGroups, flipSubtask } from "@/store/stateSlice";
-import { HiPencil } from "react-icons/hi";
-import { Icon } from "@chakra-ui/icons";
 
 export default function OpenInput({ placeholder, callback, children }: Props) {
   const [isEditing, setisEditing] = useState(false);

@@ -1,142 +1,24 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { TaskData, GroupData, Tag } from "@/interfaces/task";
 
 export interface State {
-  index: number;
-  groups: GroupData[];
-  modal: [number, number] | null;
-  tags: Tag[];
-  tagIndex: number;
+  modal: string | null;
 }
 
 const initialState: State = {
-  index: 2,
   modal: null,
-  groups: [
-    {
-      name: "Urgent",
-      color: "red",
-      tasks: [
-        {
-          name: "UI fixing",
-          id: 0,
-          description: "Add styling",
-          subtasks: [
-            ["color", true],
-            ["font", false],
-          ],
-          tags: [0, 1]
-        },
-      ],
-    },
-    {
-      name: "Researching",
-      color: "green",
-      tasks: [
-        { name: "QA Testing", id: 1, description: "Figuring out what to do with React", subtasks: [], tags: [0] },
-      ],
-    },
-  ],
-  tags: [
-    { name: "React", id: 0, color: "green" },
-    { name: "UI", id: 1, color: "red" },
-  ],
-  tagIndex: 2,
 };
 
-export const EnemySlice = createSlice({
+export const StateSlice = createSlice({
   name: "state",
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    setGroups: (state, action: PayloadAction<GroupData[]>) => {
-      state.groups = action.payload;
-    },
-    setTasks: (state, action: PayloadAction<[number, TaskData[]]>) => {
-      state.groups[action.payload[0]].tasks = action.payload[1];
-    },
-    addItem: (state, action: PayloadAction<number>) => {
-      state.groups[action.payload].tasks = [
-        ...state.groups[action.payload].tasks,
-        {
-          name: `Default ${state.index}`,
-          id: state.index,
-          description: "",
-          subtasks: [],
-          tags: [],
-        },
-      ];
-      state.index = state.index + 1;
-    },
-    addGroup: (state, action: PayloadAction<number>) => {
-      state.groups = [
-        ...state.groups.slice(0, action.payload),
-        {
-          name: "Temp",
-          color: "gray",
-          tasks: [],
-        },
-        ...state.groups.slice(action.payload),
-      ];
-    },
-    addGroupLast: (state) => {
-      state.groups = [
-        ...state.groups,
-        {
-          name: "Temp",
-          color: "gray",
-          tasks: [],
-        },
-      ];
-    },
-    setGroupColor: (state, action: PayloadAction<[number, string]>) => {
-      state.groups[action.payload[0]].color = action.payload[1];
-    },
-    setModal: (state, action: PayloadAction<[number, number]>) => {
+    setModal: (state, action: PayloadAction<string>) => {
       state.modal = action.payload;
     },
     closeModal: (state) => {
       state.modal = null;
-    },
-    updateTaskName: (
-      state,
-      action: PayloadAction<[number, number, string]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].name =
-        action.payload[2];
-    },
-    updateTaskDescription: (
-      state,
-      action: PayloadAction<[number, number, string]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].description =
-        action.payload[2];
-    },
-    flipSubtask: (
-      state,
-      action: PayloadAction<[number, number, number]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].subtasks[action.payload[2]][1] =
-        !state.groups[action.payload[0]].tasks[action.payload[1]].subtasks[action.payload[2]][1];
-    },
-    removeSubtask: (
-      state,
-      action: PayloadAction<[number, number, number]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].subtasks.splice(action.payload[2])
-    },
-    addSubTask: (
-      state,
-      action: PayloadAction<[number, number, string]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].subtasks.push([action.payload[2], false])
-    },
-    editSubtask: (
-      state,
-      action: PayloadAction<[number, number, number, string]>
-    ) => {
-      state.groups[action.payload[0]].tasks[action.payload[1]].subtasks[action.payload[2]][0] = action.payload[3]
     },
   },
   // The `extraReducers` field lets the slice handle actions defined elsewhere,
@@ -144,23 +26,9 @@ export const EnemySlice = createSlice({
 });
 
 export const {
-  setGroups,
-  setTasks,
-  addItem,
-  addGroup,
-  addGroupLast,
-  setGroupColor,
   setModal,
   closeModal,
-  updateTaskName, 
-  updateTaskDescription,
-  flipSubtask,
-  removeSubtask,
-  addSubTask,
-  editSubtask
-} = EnemySlice.actions;
-export const selectGroups = (state: RootState) => state.state.groups;
+} = StateSlice.actions;
 export const selectModal = (state: RootState) => state.state.modal;
-export const selectTags = (state: RootState) => state.state.tags;
 
-export default EnemySlice.reducer;
+export default StateSlice.reducer;

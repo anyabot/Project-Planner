@@ -1,52 +1,35 @@
-import { Box, Stack } from "@chakra-ui/react";
-import { GroupData } from "@/interfaces/task";
+import { getDate } from "@/utils";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { useState } from "react";
-import Image from "next/image";
-interface Props {
-  group: GroupData;
-  ind: number;
-}
-import {
-  Card,
-  CardHeader,
-  Heading,
-  CardBody,
-  Circle,
-  Text,
-  Button,
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  Flex,
-  Spacer,
-} from "@chakra-ui/react";
-import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import HeartBeatIcon from "../../icons/heartbeat.svg";
-import { useAppSelector, useAppDispatch } from "@/hooks";
+
+//Import Components
+import { Box, Circle, Button } from "@chakra-ui/react";
+import TaskGroupHeader from "./taskGroupHeader";
+import TaskGroupFooter from "./taskGroupFooter";
+
+// Import Icons
+import { AddIcon } from "@chakra-ui/icons";
+
+// Import Redux State
 import {
   selectGroups,
-  setGroups,
-  addItem,
-  addGroup,
-  addGroupLast,
-  setGroupColor,
-} from "@/store/stateSlice";
+} from "@/store/groupSlice";
+import {
+  selectBoards,
+  selectActiveBoard,
+} from "@/store/boardSlice";
 import TaskCard from "./taskCard";
+
+// Import Hooks
+import { useState } from "react";
+import { useAppSelector, useAppDispatch } from "@/hooks";
+import { useQuickModify } from "@/utils"
+
+// TS type for prop
+interface Props {
+  parent: string;
+  group_key: string;
+  ind: number;
+}
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   // some basic styles to make the items look a bit nicer
@@ -56,41 +39,30 @@ const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   // styles we need to apply on draggables
   ...draggableStyle,
 });
-const getListStyle = (isDraggingOver: boolean) => ({
-  background: isDraggingOver ? "lightblue" : "lightgrey",
-  width: 320,
-});
 
 const grid = 8;
 
-const colorList = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "teal",
-  "blue",
-  "cyan",
-  "gray",
-];
-
-function TaskGroup({ group, ind }: Props) {
+function TaskGroup({ parent, group_key, ind }: Props) {
+  // Redux
   const dispatch = useAppDispatch();
-  const state = useAppSelector(selectGroups);
-  const addNewItem = function (index: number) {
-    if (index < 0 || index >= state.length) return;
-    dispatch(addItem(index));
-  };
+  const boards = useAppSelector(selectBoards);
+  const activeBoard = useAppSelector(selectActiveBoard);
+  const groups = useAppSelector(selectGroups);
+  const group = groups[group_key];
+  if (!activeBoard) return null;
+
+  const [isHovering, setIsHovering] = useState(false);
+  const {newTask, newGroup, newGroupAt} = useQuickModify()
+
+  const state = boards[activeBoard].groups;
+
   const addGroupLeft = function () {
-    dispatch(addGroup(ind));
+    newGroupAt(parent, ind)
   };
   const addGroupEnd = function () {
-    dispatch(addGroupLast());
+    newGroup(parent)
   };
-  const setColor = function (color: string) {
-    dispatch(setGroupColor([ind, color]));
-  };
-  const [isHovering, setIsHovering] = useState(false);
+
   const handleMouseOver = () => {
     setIsHovering(true);
   };
@@ -98,6 +70,7 @@ function TaskGroup({ group, ind }: Props) {
   const handleMouseOut = () => {
     setIsHovering(false);
   };
+  if (!group) return null
   return (
     <Box position="relative" height="100%">
       <Box
@@ -146,79 +119,10 @@ function TaskGroup({ group, ind }: Props) {
           </Circle>
         </Box>
       )}
-      <Box minW="320px" height="100%">
+      <Box minW="320px" maxWidth="320px" height="100%">
         <Box height="100%" backgroundColor={group.color + ".300"}>
-          <Heading
-            size="md"
-            flexDirection="row"
-            display="flex"
-            color="white"
-            backgroundColor={group.color + ".400"}
-            height="60px"
-            p={2}
-            alignItems="center"
-            m={0}
-          >
-            <Circle size="25px" float="right" bg={group.color + ".300"} m={2}>
-              {group.tasks.length}
-            </Circle>
-            <Editable defaultValue={group.name} width="100%" overflow="hidden">
-              <EditablePreview />
-              <EditableInput />
-            </Editable>
-            <Popover>
-              <PopoverTrigger>
-                <ChevronDownIcon color="white" cursor="pointer" />
-              </PopoverTrigger>
-              <PopoverContent color="black">
-                <PopoverArrow />
-                <Tabs>
-                  <TabList>
-                    <Tab>Appearance</Tab>
-                    <Tab>Automations</Tab>
-                  </TabList>
-                  {/* Color Picker */}
-                  <TabPanels>
-                    <TabPanel>
-                      <Flex
-                        flexDirection="row"
-                        width="100%"
-                        justifyContent="center"
-                        alignItems="center"
-                      >
-                        {colorList.map((color) => (
-                          <>
-                            <Circle
-                              key={color}
-                              bg={color}
-                              cursor="pointer"
-                              size={group.color == color ? "25px" : "15px"}
-                              onClick={() => setColor(color)}
-                            />
-                            <Spacer />
-                          </>
-                        ))}
-                      </Flex>
-                    </TabPanel>
-                    <TabPanel>
-                      <p>two!</p>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </PopoverContent>
-            </Popover>
+          <TaskGroupHeader group_key={group_key} />
 
-          </Heading>
-          <Button
-            bg={group.color + ".300"}
-            _hover={{ bg: group.color + ".400" }}
-            onClick={() => addNewItem(ind)}
-            margin="auto"
-            display="block"
-            width="100%"
-          >
-            Add Item
-          </Button>
           <Droppable droppableId={`${ind}`}>
             {(provided, snapshot) => (
               <Box
@@ -234,12 +138,8 @@ function TaskGroup({ group, ind }: Props) {
                   className="scroller"
                 >
                   {group.tasks.map((item, index) => (
-                    <Box key={index}>
-                      <Draggable
-                        key={item.id}
-                        draggableId={item.id.toString()}
-                        index={index}
-                      >
+                    <Box key={item}>
+                      <Draggable key={item} draggableId={item} index={index}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
@@ -250,7 +150,7 @@ function TaskGroup({ group, ind }: Props) {
                               provided.draggableProps.style
                             )}
                           >
-                            <TaskCard task={item} ind={index} groupInd = {ind} />
+                            <TaskCard group_key={group_key} task_key={item} />
                           </div>
                         )}
                       </Draggable>
@@ -261,6 +161,7 @@ function TaskGroup({ group, ind }: Props) {
               </Box>
             )}
           </Droppable>
+          <TaskGroupFooter group_key={group_key}/>
         </Box>
       </Box>
     </Box>

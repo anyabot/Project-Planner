@@ -1,36 +1,52 @@
-import { Box, Stack } from "@chakra-ui/react";
-import { GroupData, TaskData } from "@/interfaces/task";
-import { useState } from "react";
-interface Props {
-  task: TaskData;
-  ind: number;
-  groupInd: number;
-}
+// Import Components 
 import {
+  Box,
   Card,
   CardHeader,
   Heading,
   CardBody,
   Tag,
   Text,
-  Button,
-  Image,
-  Divider,
   CardFooter,
   Progress,
   ListItem,
   UnorderedList
 } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { useAppSelector, useAppDispatch } from "@/hooks";
-import { setModal, selectTags } from "@/store/stateSlice";
 
-function TaskCard({ task, ind, groupInd }: Props) {
-  const [progessOpen, setOpen] = useState(false);
+// Import Redux State 
+import { setModal } from "@/store/stateSlice";
+import { selectGroups } from "@/store/groupSlice";
+import { selectTasks } from "@/store/taskSlice"
+import { selectBoards, selectActiveBoard } from "@/store/boardSlice";
+
+// Import Icons
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+
+//Import Hooks 
+import { useAppSelector, useAppDispatch } from "@/hooks";
+import { useState } from "react";
+
+// TS type for prop
+interface Props {
+  group_key: string;
+  task_key: string;
+}
+
+function TaskCard({ group_key, task_key }: Props) {
+  // Redux 
   const dispatch = useAppDispatch();
-  const tags = useAppSelector(selectTags);
+  const boards = useAppSelector(selectBoards);
+  const activeBoard = useAppSelector(selectActiveBoard);
+  const groups = useAppSelector(selectGroups);
+  const tasks = useAppSelector(selectTasks);
+  const task = tasks[task_key]
+  if (!activeBoard) return (null)
+
+  const board = boards[activeBoard]
+  const [progessOpen, setOpen] = useState(false);
+  const tags = board.tags
   const modal = function () {
-    dispatch(setModal([groupInd, ind]));
+    dispatch(setModal(task_key));
   };
   const getCompleted = function () {
     return task.subtasks.filter((st) => st[1]).length;
@@ -38,6 +54,7 @@ function TaskCard({ task, ind, groupInd }: Props) {
   const getLineThrough = (b: boolean) => {
     return b ? "" : "line-through"
   }
+  if (!task) return null
   return (
     <Box m="auto">
       <Card m="2" _hover={{ color: "blue" }}  onClick={modal} cursor="pointer">
