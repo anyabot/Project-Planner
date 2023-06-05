@@ -60,11 +60,11 @@ function TaskCard({ group_key, task_key }: Props) {
       <Card m="2" _hover={{ color: "blue" }}  onClick={modal} cursor="pointer">
         {task.tags.length ? (
           <CardHeader display="flex" flexDirection="row" p="2">
-            {task.tags.map((tag) => (
-              <Tag key={`tag${tag}`} colorScheme={tags[tag].color} px="5px" mx="5px">
+            {task.tags.map((tag) => 
+              tags[tag] ? <Tag key={`tag${tag}`} colorScheme={tags[tag].color} px="5px" mx="5px">
                 {tags[tag].name}
-              </Tag>
-            ))}
+              </Tag> : null
+            )}
           </CardHeader>
         ) : null}
         <CardBody p={2}>

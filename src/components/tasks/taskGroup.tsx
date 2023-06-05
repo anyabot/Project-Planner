@@ -2,7 +2,7 @@ import { getDate } from "@/utils";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 
 //Import Components
-import { Box, Circle, Button } from "@chakra-ui/react";
+import { Box, Circle } from "@chakra-ui/react";
 import TaskGroupHeader from "./taskGroupHeader";
 import TaskGroupFooter from "./taskGroupFooter";
 
@@ -20,9 +20,10 @@ import {
 import TaskCard from "./taskCard";
 
 // Import Hooks
-import { useState } from "react";
-import { useAppSelector, useAppDispatch } from "@/hooks";
+import { useState, useCallback } from "react";
+import { useAppSelector } from "@/hooks";
 import { useQuickModify } from "@/utils"
+import AddGroup from "./addGroup";
 
 // TS type for prop
 interface Props {
@@ -44,7 +45,6 @@ const grid = 8;
 
 function TaskGroup({ parent, group_key, ind }: Props) {
   // Redux
-  const dispatch = useAppDispatch();
   const boards = useAppSelector(selectBoards);
   const activeBoard = useAppSelector(selectActiveBoard);
   const groups = useAppSelector(selectGroups);
@@ -52,16 +52,13 @@ function TaskGroup({ parent, group_key, ind }: Props) {
   if (!activeBoard) return null;
 
   const [isHovering, setIsHovering] = useState(false);
-  const {newTask, newGroup, newGroupAt} = useQuickModify()
+  const {newGroupAt} = useQuickModify()
 
   const state = boards[activeBoard].groups;
 
-  const addGroupLeft = function () {
-    newGroupAt(parent, ind)
-  };
-  const addGroupEnd = function () {
-    newGroup(parent)
-  };
+  const addGroupLeft = useCallback( (name: string, color: string) =>  {
+    activeBoard ? newGroupAt(parent, ind, name, color) : null
+  }, [boards, activeBoard])
 
   const handleMouseOver = () => {
     setIsHovering(true);
@@ -73,6 +70,7 @@ function TaskGroup({ parent, group_key, ind }: Props) {
   if (!group) return null
   return (
     <Box position="relative" height="100%">
+      <AddGroup callback={addGroupLeft}>
       <Box
         w="30px"
         h="30px"
@@ -83,45 +81,24 @@ function TaskGroup({ parent, group_key, ind }: Props) {
         left="0"
         top="30px"
       >
-        {isHovering && (
-          <Circle
+          
+            <Circle
             size="30px"
             bg="purple.700"
             color="white"
-            onClick={addGroupLeft}
             _hover={{
               cursor: "pointer",
             }}
+            visibility={isHovering ? "visible" : "hidden"}
           >
             <AddIcon />
           </Circle>
-        )}
+          
       </Box>
-      {ind == state.length - 1 && (
-        <Box
-          w="30px"
-          h="30px"
-          position="absolute"
-          transform="translateY(-50%) translateX(50%)"
-          right="-30px"
-          top="30px"
-        >
-          <Circle
-            size="30px"
-            bg="gray.700"
-            color="white"
-            onClick={addGroupEnd}
-            _hover={{
-              cursor: "pointer",
-            }}
-          >
-            <AddIcon />
-          </Circle>
-        </Box>
-      )}
+      </AddGroup>
       <Box minW="320px" maxWidth="320px" height="100%">
         <Box height="100%" backgroundColor={group.color + ".300"}>
-          <TaskGroupHeader group_key={group_key} />
+          <TaskGroupHeader group_key={group_key} key={group_key} />
 
           <Droppable droppableId={`${ind}`}>
             {(provided, snapshot) => (

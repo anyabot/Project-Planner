@@ -126,13 +126,13 @@ export default function TaskModal() {
           </Editable>
         </ModalHeader>
 
-        <ModalBody p={4}>
+        <ModalBody p={4} overflow="visible">
           
           <ModalSection icon="tag" header="Tags">
             {task.tags.map((tag) => (
-              <Tag key={tag} colorScheme={tags[tag].color} px="5px" mx="5px">
+              tags[tag] ? <Tag key={tag} colorScheme={tags[tag].color} px="5px" mx="5px">
                 {tags[tag].name}
-              </Tag>
+              </Tag> : null 
             ))}
               <LabelEditor initial_mode="switch" task={task_key}>
                 <Tag colorScheme="gray" px="5px" mx="5px" cursor="pointer">
@@ -157,13 +157,11 @@ export default function TaskModal() {
           <ModalSection icon="check" header="Tasks">
             <Stack>
               {task.subtasks.map((subtask, index) => (
-                <>
                   <SubtaskCheckBox
                     key={index}
                     task_key={task_key}
                     ind={index}
                   />
-                </>
               ))}
               <OpenInput
                 placeholder="Enter New Subtask"

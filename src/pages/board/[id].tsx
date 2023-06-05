@@ -7,8 +7,9 @@ import {
   DropResult,
   DraggableLocation,
 } from "react-beautiful-dnd";
-import { Box } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 const TaskGroup = dynamic(import("@/components/tasks/taskGroup"));
+import AddGroup from "@/components/tasks/addGroup";
 import Error from "next/error";
 
 // Import Redux States
@@ -23,7 +24,11 @@ import {
 //Import Hooks
 import { useRouter } from "next/router";
 import { useAppSelector, useAppDispatch } from "@/hooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useQuickModify } from "@/utils"
+
+//Import Icons
+import { AddIcon } from "@chakra-ui/icons";
 
 const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
@@ -105,6 +110,15 @@ export default function Home() {
       dispatch(setTasks([state.groups[dInd], result[1]]));
     }
   }
+
+  const {newGroupAt} = useQuickModify()
+
+  const addGroupEnd = useCallback( (name: string, color: string) =>  {
+    activeBoard ? newGroupAt(activeBoard, boards[activeBoard].groups.length, name, color) : null
+  }, [boards, activeBoard])
+
+
+
   if (router.isReady) {
     if (!activeBoard || !(activeBoard in boards))
       return (
@@ -127,6 +141,17 @@ export default function Home() {
                   ></TaskGroup>
                 ))
               : null}
+              <AddGroup callback={addGroupEnd}>
+                        <Button height="60px" m="8px"
+            bg={"gray.300"}
+            _hover={{ bg: "gray.400" }}
+            margin="auto"
+            display="block"
+            width="320px"
+          >
+            <><AddIcon boxSize="10px"/>Add Group</>
+          </Button>
+          </AddGroup>
           </Box>
         ) : null}
       </DragDropContext>

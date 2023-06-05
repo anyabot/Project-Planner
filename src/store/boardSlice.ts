@@ -23,7 +23,7 @@ const initialState: Boards = {
 };
 
 export const BoardSlice = createSlice({
-  name: "projects",
+  name: "boards",
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -33,7 +33,7 @@ export const BoardSlice = createSlice({
     addBoard: (state, action: PayloadAction<[string, string, string]>) => {
       state.boards[action.payload[0]] = { name: action.payload[1], parent: action.payload[2], groups: [""], tags: {} }
     },
-    renameProject: (state, action: PayloadAction<[string, string]>) => {
+    renameBoard: (state, action: PayloadAction<[string, string]>) => {
       action.payload[0] in state.boards ? state.boards[action.payload[0]].name = action.payload[1] : null
     },
     deleteBoard: (state, action: PayloadAction<string>) => {
@@ -67,9 +67,13 @@ export const BoardSlice = createSlice({
     },
     addTag: (state, action: PayloadAction<[string, string, string, string]>) => {
       if (action.payload[0] in state.boards) {
-        let temp = state.boards[action.payload[0]].tags[action.payload[1]] = ({ name: action.payload[2], color: action.payload[3] })
+        state.boards[action.payload[0]].tags[action.payload[1]] = ({ name: action.payload[2], color: action.payload[3] })
       }
-      
+    },
+    removeTag: (state, action: PayloadAction<[string, string]>) => {
+      if (action.payload[0] in state.boards) {
+        delete state.boards[action.payload[0]].tags[action.payload[1]]
+      }
     },
   },
   // The `extraReducers` field lets the slice handle actions defined elsewhere,
@@ -79,11 +83,12 @@ export const BoardSlice = createSlice({
 export const {
   setActiveBoard,
   addBoard,
-  renameProject,
+  renameBoard,
   deleteBoard,
   addGroupToBoard, addGroupToBoardAt, removeGroupFromBoard,
   removeBoard,
-  addTag
+  addTag,
+  removeTag
 } = BoardSlice.actions;
 export const selectBoards = (state: RootState) => state.boards.boards;
 export const selectActiveBoard = (state: RootState) => state.boards.active;

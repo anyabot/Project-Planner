@@ -37,7 +37,7 @@ export const ProjectSlice = createSlice({
       action.payload[0] in state.projects ? state.projects[action.payload[0]].name = action.payload[1] : null
     },
     addBoardToProject: (state, action: PayloadAction<[string, string]>) => {
-      action.payload[0] in state.projects ? state.projects[action.payload[0]].boards.push(action.payload[1]) : null
+      action.payload[0] in state.projects ? null : state.projects[action.payload[0]].boards.push(action.payload[1])
     },
     removeBoardFromProject: (state, action: PayloadAction<[string, string]>) => {
       if (action.payload[0] in state.projects) {

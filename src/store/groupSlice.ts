@@ -37,10 +37,10 @@ export const GroupSlice = createSlice({
     setGroup: (state, action: PayloadAction<[string, Group]>) => {
       action.payload[0] in state ? state[action.payload[0]] = action.payload[1] : null
     },
-    addGroup: (state, action: PayloadAction<string>) => {
-      state[action.payload] = {
-          name: "New Group",
-          color: "gray",
+    addGroup: (state, action: PayloadAction<[string, string, string]>) => {
+      state[action.payload[0]] = {
+          name: action.payload[1],
+          color: action.payload[2],
           tasks: [
           ],
       }

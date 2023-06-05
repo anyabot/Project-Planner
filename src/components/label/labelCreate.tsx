@@ -20,11 +20,13 @@ import {
   Text,
   Input ,
   ButtonGroup,
+  Tooltip,
+  Portal
 } from "@chakra-ui/react";
 import ColorPicker from "../utils/colorPicker";
 
 // Import Icons
-import { DeleteIcon, Icon } from "@chakra-ui/icons";
+import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { CgColorPicker } from "react-icons/cg";
 
 // Import Redux State
@@ -33,7 +35,9 @@ import {
   setGroupColor,
 } from "@/store/groupSlice";
 import {
+  selectBoards,
   selectActiveBoard,
+  addTag
 } from "@/store/boardSlice";
 
 // Import Hooks
@@ -43,29 +47,43 @@ import { useQuickModify } from "@/utils"
 
 // TS type for prop
 interface Props {
-  onClose: () => void
+  onClose: () => void,
+  back: () => void,
+  editing_tag?: string,
 }
 
-function LabelAdd({ onClose }: Props) {
+function LabelAdd({ back, onClose, editing_tag }: Props) {
   // Redux
   const activeBoard = useAppSelector(selectActiveBoard);
   if (!activeBoard) return null;
+  const boards = useAppSelector(selectBoards);
+  const board = boards[activeBoard]
+  const tags = board.tags
+  let tag
+  if (editing_tag && (editing_tag in tags)) {
+    tag = tags[editing_tag]
+  } 
 
-  const [tagName, setTagName] = useState("")
-  const [tagColor, setTagColor] = useState("gray")
+  const [tagName, setTagName] = useState(tag?.name || "")
+  const [tagColor, setTagColor] = useState(tag?.color || "gray")
 
-  const {newTag} = useQuickModify()
+  const {newTag, deleteTag} = useQuickModify()
 
-  const addTag = function (name: string, color: string) {
+  const addNewTag = function (name: string, color: string) {
     name ? newTag(activeBoard, name, color) : null
     setTagName("")
-    onClose()
+    back()
+  };
+  const editTag = function (tag_id:string , name: string, color: string) {
+    name ? addTag([activeBoard, tag_id, name, color]) : null
+    setTagName("")
+    back()
   };
 
   return (
         <PopoverContent color="black">
             <PopoverArrow />
-            <PopoverHeader fontWeight="semibold">Add Tag</PopoverHeader>
+            <PopoverHeader fontWeight="semibold"><ChevronLeftIcon cursor="pointer" onClick={back}/>{editing_tag ? "Edit Tag" : "Create Task"}</PopoverHeader>
             <PopoverCloseButton />
             <PopoverBody>
               <Text fontSize="12px" mb="6px">Tag Name</Text>
@@ -75,8 +93,38 @@ function LabelAdd({ onClose }: Props) {
             </PopoverBody>
             <PopoverFooter display="flex" justifyContent="flex-end">
               <ButtonGroup size="sm">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button colorScheme="red" onClick={() => addTag(tagName, tagColor)}>Add Task</Button>
+              {editing_tag ? 
+              <Box display="contents"><Popover>
+                <Box>
+                  <PopoverTrigger>
+                  <Button colorScheme="red">Delete Tag</Button>
+                  </PopoverTrigger>
+                </Box>
+                <PopoverContent color="black">
+                  <PopoverArrow />
+                  <PopoverHeader fontWeight="semibold">Delete Tag</PopoverHeader>
+                  <PopoverCloseButton />
+                  <PopoverBody>
+                    Are you sure you want to delete this tag?
+                    <br />
+                    It will be removed from all tasks.
+                    <br />
+                    This action is irrevesible!
+                    <br/>
+                  </PopoverBody>
+                  <PopoverFooter display="flex" justifyContent="flex-end">
+                    <ButtonGroup size="sm">
+                      <Button colorScheme="red" onClick={() => {
+                        deleteTag(editing_tag)
+                        back()
+                      }}>Delete</Button>
+                    </ButtonGroup>
+                  </PopoverFooter>
+                </PopoverContent>
+              </Popover>
+              <Button colorScheme="blue" onClick={() => editTag(editing_tag, tagName, tagColor)}> Edit Tag</Button>
+              </Box>
+              : <Button colorScheme="blue" onClick={() => addNewTag(tagName, tagColor)}> {editing_tag ? "Edit Tag" : "Create Task"}</Button> }
               </ButtonGroup>
             </PopoverFooter>
           </PopoverContent>

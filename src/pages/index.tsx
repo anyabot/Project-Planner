@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 // Import Redux State 
 import { selectProjects, setActiveProject } from '@/store/projectSlice';
+import { setActiveBoard } from '@/store/boardSlice';
 
 // Import Hooks
 import { useAppSelector, useAppDispatch } from '@/hooks';
@@ -14,6 +15,7 @@ export default function Home() {
   const projects = useAppSelector(selectProjects);
   useEffect(() => {
     dispatch(setActiveProject(null))
+    dispatch(setActiveBoard(null))
   }, []);
   return (
     <Container minW={['container.sm', 'container.md', 'container.lg', 'container.xl', 'container.xl']}>

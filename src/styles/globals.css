@@ -128,4 +128,5 @@ a {
   overflow: hidden;
   padding: 10px 34px 6px 14px;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }

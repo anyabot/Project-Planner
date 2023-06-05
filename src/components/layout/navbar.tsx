@@ -11,8 +11,6 @@ function CommonNavbar() {
       justify="space-between"
       wrap="wrap"
       w="100%"
-      bg="blackAlpha.900"
-      color="gray"
     >
       <NavContent />
     </Flex>

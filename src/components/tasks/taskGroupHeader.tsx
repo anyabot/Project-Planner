@@ -41,6 +41,7 @@ import {
 import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { useQuickModify } from "@/utils"
+import { useDisclosure } from "@chakra-ui/react";
 
 // TS type for prop
 interface Props {
@@ -153,8 +154,7 @@ function TaskGroupHeader({ group_key }: Props) {
             </PopoverBody>
             <PopoverFooter display="flex" justifyContent="flex-end">
               <ButtonGroup size="sm">
-                <Button variant="outline">Cancel</Button>
-                <Button colorScheme="red" onClick={() => deleteGroup(group_key)}>Apply</Button>
+                <Button colorScheme="red" onClick={() => deleteGroup(group_key)}>Delete</Button>
               </ButtonGroup>
             </PopoverFooter>
           </PopoverContent>

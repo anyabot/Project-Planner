@@ -1,16 +1,7 @@
-import { getDate } from "@/utils";
-
 //Import Components
 import {
   Box,
-  Heading,
-  Circle,
   Button,
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Popover,
-  PopoverTrigger,
   PopoverContent,
   PopoverArrow,
   PopoverFooter,
@@ -19,87 +10,90 @@ import {
   PopoverHeader,
   Checkbox,
   ButtonGroup,
+  Tooltip,
 } from "@chakra-ui/react";
-import ColorPicker from "../utils/colorPicker";
 
 // Import Icons
-import { DeleteIcon, Icon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
 import { HiPencil } from "react-icons/hi";
 
 // Import Redux State
 import { selectTasks, toogleTag } from "@/store/taskSlice";
-import {
-  selectActiveBoard,
-  selectBoards
-} from "@/store/boardSlice";
+import { selectActiveBoard, selectBoards } from "@/store/boardSlice";
 
 // Import Hooks
-import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks";
-import { useQuickModify } from "@/utils"
 
 // TS type for prop
 interface Props {
-  task_key: string
-  onClose: () => void
+  task_key: string;
+  onClose: () => void;
+  changeMode: () => void;
+  changeEditing: (e: string) => void;
 }
 
-function LabelSwitch({ task_key, onClose }: Props) {
+function LabelSwitch({ task_key, onClose, changeMode, changeEditing }: Props) {
   // Redux
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const activeBoard = useAppSelector(selectActiveBoard);
   const boards = useAppSelector(selectBoards);
   const tasks = useAppSelector(selectTasks);
 
   // Must be here to avoid "Rendered more hooks than during the previous render"
-  const task = tasks[task_key]
+  const task = tasks[task_key];
   if (!activeBoard) return null;
 
-  const tags = boards[activeBoard].tags
-  const tags_key = Object.keys(tags)
-
-  const [tagName, setTagName] = useState("")
-  const [tagColor, setTagColor] = useState("gray")
-
-  const {newTag} = useQuickModify()
-
-  const addTag = function (name: string, color: string) {
-    name ? newTag(activeBoard, name, color) : null
-    setTagName("")
-    onClose()
-  };
-
+  const tags = boards[activeBoard].tags;
+  const tags_key = Object.keys(tags);
   return (
-        <PopoverContent color="black">
-            <PopoverArrow />
-            <PopoverHeader fontWeight="semibold">Add Tag</PopoverHeader>
-            <PopoverCloseButton />
-            <PopoverBody>
-              {tags_key.map(tag => (
-                <Box
-              position="relative"
+    <PopoverContent color="black">
+      <PopoverArrow />
+      <PopoverHeader fontWeight="semibold">Add Tag</PopoverHeader>
+      <PopoverCloseButton />
+      <PopoverBody>
+        {tags_key.map((tag) => (
+          <Box
+            key={tag}
+            position="relative"
+            display="flex"
+            width="full"
+            textAlign="center"
+          >
+            <Checkbox
+              isChecked={task.tags.includes(tag)}
+              flex="auto"
+              onChange={() => {
+                dispatch(toogleTag([task_key, tag]));
+              }}
+              bgColor={tags[tag].color + ".200"}
+              colorScheme={tags[tag].color}
             >
-              <Checkbox
-                isChecked={task.tags.includes(tag)}
-                w="full"
-                onChange={() => {
-                  dispatch(toogleTag([task_key, tag]));
-                }}
-                bgColor={tags[tag].color + ".200"}
-              >
-                {tags[tag].name}
-              </Checkbox>
-              <Icon position="absolute" right="0" as={HiPencil} size="32px" />
+              {tags[tag].name}
+            </Checkbox>
+            <Box flex="initial">
+              <Tooltip label="Edit Tag">
+                <Box>
+                <Icon
+                  as={HiPencil}
+                  boxSize="20px"
+                  m={1}
+                  cursor="pointer"
+                  onClick={() => changeEditing(tag)}
+                />
+                </Box>
+              </Tooltip>
             </Box>
-              ))}
-            
-            </PopoverBody>
-            <PopoverFooter display="flex" justifyContent="flex-end">
-              <ButtonGroup size="sm">
-                <Button colorScheme="red" onClick={() => addTag(tagName, tagColor)}>Create New Tag</Button>
-              </ButtonGroup>
-            </PopoverFooter>
-          </PopoverContent>
+          </Box>
+        ))}
+      </PopoverBody>
+      <PopoverFooter display="flex" justifyContent="flex-end">
+        <ButtonGroup size="sm">
+          <Button colorScheme="red" onClick={() => changeMode()}>
+            Create New Tag
+          </Button>
+        </ButtonGroup>
+      </PopoverFooter>
+    </PopoverContent>
   );
 }
 
