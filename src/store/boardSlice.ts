@@ -12,7 +12,7 @@ export interface Boards {
 const initialState: Boards = {
   active: null,
   boards: {
-    "sample_board_1": { name: "Sample Board", parent: "sample", groups: ["sample_group_1", "sample_group_2", "sample_group_3"], tags: {
+    "sample_board_1": { name: "Sample Board", parent: "sample", groups: ["sample_group_1", "sample_group_2", "sample_group_3", "unneeded_group"], tags: {
       "sample_tag_1": { name: "Urgent", color: "red" },
       "sample_tag_2": { name: "React", color: "green" },
       "sample_tag_3": { name: "UI", color: "blue" }

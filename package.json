@@ -21,14 +21,20 @@
     "@types/react-dom": "18.2.4",
     "autosize": "^6.0.1",
     "bootstrap": "^5.2.3",
+    "easymde": "^2.18.0",
     "framer-motion": "^10.12.16",
+    "github-markdown-css": "^5.2.0",
     "next": "13.4.4",
     "react": "18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "18.2.0",
     "react-icons": "^4.9.0",
+    "react-markdown": "^8.0.7",
     "react-redux": "^8.0.5",
     "react-scrollbars-custom": "^4.1.1",
+    "react-simplemde-editor": "^5.2.0",
+    "remark-breaks": "^3.0.3",
+    "remark-gfm": "^3.0.1",
     "typescript": "5.0.4"
   }
 }

@@ -87,6 +87,7 @@ function TaskCard({ group_key, task_key }: Props) {
               }}  cursor="pointer"
             >
               {task.subtasks.length ? (
+                <>
                 <Progress
                   borderRadius="3px"
                   colorScheme="blue"
@@ -95,8 +96,7 @@ function TaskCard({ group_key, task_key }: Props) {
                   w="75%"
                   m="3px"
                 />
-              ) : null}
-              <Text fontSize="12px" lineHeight="12px" marginLeft="auto">
+                <Text fontSize="12px" lineHeight="12px" marginLeft="auto">
                 {getCompleted()} / {task.subtasks.length}
               </Text>
               {progessOpen ? (
@@ -104,6 +104,9 @@ function TaskCard({ group_key, task_key }: Props) {
               ) : (
                 <ChevronDownIcon boxSize="12px" />
               )}
+              </>
+              ) : null}
+              
             </Box>
             <UnorderedList>
             {progessOpen

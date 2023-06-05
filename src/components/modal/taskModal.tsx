@@ -1,4 +1,7 @@
 import { Task } from "@/interfaces/task";
+import "easymde/dist/easymde.min.css";
+import 'github-markdown-css'
+import dynamic from "next/dynamic";
 
 // Import Components 
 import {
@@ -11,7 +14,7 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
-  EditableTextarea,
+  Box,
   Tag,
   Input,
   useEditableControls,
@@ -23,6 +26,13 @@ import {
 import SubtaskCheckBox from "../tasks/subtaskCheckbox";
 import OpenInput from "../utils/openInput";
 import LabelEditor from "../label/labelEditor";
+const SimpleMDE = dynamic(
+	() => import("react-simplemde-editor"),
+	{ ssr: false }
+);
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 // Import Redux States 
 import { selectModal, closeModal } from "@/store/stateSlice";
@@ -39,8 +49,10 @@ import ModalSection from "./modalSection";
 import { CheckIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 
 // Import Hooks 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks";
+import { useDisclosure } from "@chakra-ui/react";
+import { errorMonitor } from "events";
 
 export default function TaskModal() {
   // Redux
@@ -50,15 +62,30 @@ export default function TaskModal() {
   const tasks = useAppSelector(selectTasks);
   // Must be here to avoid "Rendered more hooks than during the previous render"
   const [task, updateTask] = useState<Task | null>();
+  const [value, setValue] = useState("");
   useEffect(() => {
-    task_key ? (task_key in tasks ? updateTask(tasks[task_key]) : null) : null;
+    if (task_key && task_key in tasks) {
+      updateTask(tasks[task_key]) 
+      setValue(tasks[task_key].description)
+    }
   }, [tasks, task_key]);
+
+  const { onOpen, onClose, isOpen } = useDisclosure();
+  const autofocusNoSpellcheckerOptions = useMemo(() => {
+    return {
+      autofocus: true,
+      spellChecker: false,
+    };
+  }, []);
+
 
   const activeBoard = useAppSelector(selectActiveBoard);
   if (!activeBoard) return null;
   const board = boards[activeBoard];
   const tags = board.tags;
   if (!activeBoard || !(activeBoard in boards)) return null;
+
+
 
   function doShow() {
     return task ? true : false;
@@ -67,6 +94,11 @@ export default function TaskModal() {
     updateTask(null)
     dispatch(closeModal());
   }
+
+  function updateDescription() {
+    task_key ? dispatch(updateTaskDescription([task_key, value])) : null
+  }
+
   function EditableControls() {
     const {
       isEditing,
@@ -92,7 +124,7 @@ export default function TaskModal() {
       isOpen={doShow()}
       onClose={hide}
       aria-labelledby="contained-modal-title-vcenter"
-      scrollBehavior="inside"
+      scrollBehavior="outside"
     >
       <ModalOverlay />
       <ModalContent
@@ -141,18 +173,19 @@ export default function TaskModal() {
               </LabelEditor>
           </ModalSection>
           <ModalSection icon="hamburger" header="Description">
-            <Editable
-              fontSize="md"
-              defaultValue={task.description}
-              width="100%"
-              my="5px"
-              bgColor="gray.100"
-              onSubmit={(e) => dispatch(updateTaskDescription([task_key, e]))}
-              submitOnBlur={true}
-            >
-              <EditablePreview width="100%" whiteSpace="pre-wrap" />
-              <EditableTextarea height="300px" />
-            </Editable>
+            {isOpen}
+            {isOpen ? 
+            <Box>
+              <SimpleMDE value={value} onChange={(e) => setValue(e)} placeholder={"Enter Description"} options={autofocusNoSpellcheckerOptions}/>
+              <Button colorScheme="green" onClick={() => {
+                console.log(JSON.stringify(value))
+                updateDescription();
+                onClose()
+              }}>Save</Button>
+              </Box>
+            : <Box onClick={onOpen} className='markdown-body'><ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{value || "Add Description"}</ReactMarkdown></Box>}
+          
+
           </ModalSection>
           <ModalSection icon="check" header="Tasks">
             <Stack>

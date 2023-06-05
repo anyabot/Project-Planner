@@ -24,7 +24,24 @@ const initialState: Groups = {
     name: "Done",
     color: "blue",
     tasks: [
-      "task_3"
+      "task_3",
+      "markdown"
+    ],
+  },
+  "unneeded_group": {
+    name: "Uneeded",
+    color: "teal",
+    tasks: [
+      "uneeded_1",
+      "uneeded_2",
+      "uneeded_3",
+      "uneeded_4",
+      "uneeded_5",
+      "uneeded_6",
+      "uneeded_7",
+      "uneeded_8",
+      "uneeded_9",
+      "uneeded_10"
     ],
   }
 };

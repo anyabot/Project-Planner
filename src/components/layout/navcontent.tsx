@@ -35,7 +35,7 @@ function NavContent () {
       align="center"
       direction={"row"}
     >
-      <Stack as={Link} href="/"   marginLeft="auto" w="100%"         direction={"row"}>
+      <Stack marginLeft="auto" w="100%"         direction={"row"}>
       <ChevronLeftIcon boxSize="30px"/>
       <NavLink to="/" fontSize='xl' mx={4}>{activeProject}</NavLink>
       </Stack>
