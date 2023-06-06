@@ -18,28 +18,25 @@ import { Icon } from "@chakra-ui/icons";
 import { HiPencil } from "react-icons/hi";
 
 // Import Redux State
-import { selectTasks, toogleTag } from "@/store/taskSlice";
 import { selectActiveBoard, selectBoards } from "@/store/boardSlice";
 
 // Import Hooks
-import { useAppSelector, useAppDispatch } from "@/hooks";
+import { useAppSelector } from "@/hooks";
 
 // TS type for prop
 interface Props {
-  task_key: string;
+  key_list: string[]
+  callback: (e: string) => void;
   changeMode: () => void;
   changeEditing: (e: string) => void;
 }
 
-function LabelSwitch({ task_key, changeMode, changeEditing }: Props) {
+function LabelFilter({ key_list, changeMode, changeEditing, callback }: Props) {
   // Redux
-  const dispatch = useAppDispatch();
   const activeBoard = useAppSelector(selectActiveBoard);
   const boards = useAppSelector(selectBoards);
-  const tasks = useAppSelector(selectTasks);
 
   // Must be here to avoid "Rendered more hooks than during the previous render"
-  const task = tasks[task_key];
   if (!activeBoard) return null;
 
   const tags = boards[activeBoard].tags;
@@ -47,7 +44,7 @@ function LabelSwitch({ task_key, changeMode, changeEditing }: Props) {
   return (
     <PopoverContent color="black">
       <PopoverArrow />
-      <PopoverHeader fontWeight="semibold">Add Tag</PopoverHeader>
+      <PopoverHeader fontWeight="semibold">Filter Tag</PopoverHeader>
       <PopoverCloseButton />
       <PopoverBody>
         {tags_key.map((tag) => (
@@ -59,10 +56,10 @@ function LabelSwitch({ task_key, changeMode, changeEditing }: Props) {
             textAlign="center"
           >
             <Checkbox
-              isChecked={task.tags.includes(tag)}
+              isChecked={key_list.includes(tag)}
               flex="auto"
               onChange={() => {
-                dispatch(toogleTag([task_key, tag]));
+                callback(tag)
               }}
               bgColor={tags[tag].color + ".200"}
               colorScheme={tags[tag].color}
@@ -96,4 +93,4 @@ function LabelSwitch({ task_key, changeMode, changeEditing }: Props) {
   );
 }
 
-export default LabelSwitch;
+export default LabelFilter;

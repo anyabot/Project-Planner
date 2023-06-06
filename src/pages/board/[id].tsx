@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { Board, Group } from "@/interfaces/task";
-import { debounce } from 'lodash';
+import { debounce } from "lodash";
 import { FormEvent } from "react";
 
 //Import Conponents
@@ -9,10 +9,11 @@ import {
   DropResult,
   DraggableLocation,
 } from "react-beautiful-dnd";
-import { Box, Button, Stack,  } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 const TaskGroup = dynamic(import("@/components/tasks/taskGroup"));
 import AddGroup from "@/components/tasks/addGroup";
 import SearchBar from "@/components/utils/searchBar";
+import LabelEditor from "@/components/label/labelEditor";
 import Error from "next/error";
 import Head from "next/head";
 
@@ -29,10 +30,11 @@ import {
 import { useRouter } from "next/router";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { useState, useEffect, useCallback } from "react";
-import { useQuickModify } from "@/utils"
+import { useQuickModify } from "@/utils";
 
 //Import Icons
-import { AddIcon, Search2Icon } from "@chakra-ui/icons";
+import { AddIcon, Icon } from "@chakra-ui/icons";
+import { HiFilter } from "react-icons/hi";
 
 const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
@@ -75,6 +77,7 @@ export default function Home() {
   const [winReady, setwinReady] = useState(false);
   const [state, setState] = useState<Board>();
   const [search, setSearch] = useState("");
+  const [filterTags, setFilterTags] = useState<string[]>([]);
 
   // Use Effects
   useEffect(() => {
@@ -90,8 +93,26 @@ export default function Home() {
   useEffect(() => {
     setwinReady(true);
   }, []);
+  useEffect(() => {
+    state
+      ? setFilterTags(
+          filterTags.filter((tag) => Object.keys(state.tags).includes(tag))
+        )
+      : null;
+  }, [state?.tags]);
 
   //Utility Functions
+  const addOrRemove = debounce((e: string) => {
+    var index = filterTags.indexOf(e);
+    if (index === -1) {
+      setFilterTags([...filterTags, e]);
+    } else {
+      const temp = [...filterTags]
+      temp.splice(index, 1)
+      setFilterTags(temp);
+    }
+  }, 200)
+
   function onDragEnd(result: DropResult) {
     if (!state) return;
     const { source, destination } = result;
@@ -119,14 +140,23 @@ export default function Home() {
   const handleChange = debounce((e: FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLTextAreaElement;
     setSearch(target.value);
-  },
-  300)
+  }, 300);
 
-  const {newGroupAt} = useQuickModify()
+  const { newGroupAt } = useQuickModify();
 
-  const addGroupEnd = useCallback( (name: string, color: string) =>  {
-    activeBoard ? newGroupAt(activeBoard, boards[activeBoard].groups.length, name, color) : null
-  }, [boards, activeBoard])
+  const addGroupEnd = useCallback(
+    (name: string, color: string) => {
+      activeBoard
+        ? newGroupAt(
+            activeBoard,
+            boards[activeBoard].groups.length,
+            name,
+            color
+          )
+        : null;
+    },
+    [boards, activeBoard]
+  );
 
   if (router.isReady) {
     if (!activeBoard || !(activeBoard in boards))
@@ -138,40 +168,62 @@ export default function Home() {
 
     return (
       <>
-      <Head>
-        <title>{boards[activeBoard].name}</title>
-      </Head>
-      <Stack flexDirection="row" m={4}>
-        <SearchBar placeholder="Search Tasks..." callback={handleChange} />
-      </Stack>
-      <DragDropContext onDragEnd={onDragEnd}>
-        {winReady ? (
-          <Box display="flex" flexDirection="row" width="100%" h="calc(100% - 64px)">
-            {state
-              ? state.groups.map((el, ind) => (
-                  <TaskGroup
-                    parent={id}
-                    group_key={el}
-                    ind={ind}
-                    key={ind}
-                    search={search}
-                  ></TaskGroup>
-                ))
-              : null}
-              <AddGroup callback={addGroupEnd}>
-                        <Button height="60px" m="8px"
-            bg={"gray.300"}
-            _hover={{ bg: "gray.400" }}
-            margin="auto"
-            display="block"
-            width="320px"
+        <Head>
+          <title>{boards[activeBoard].name}</title>
+        </Head>
+        <Stack flexDirection="row" m={4} alignItems="center" gap={8}>
+          <LabelEditor
+            initial_mode="filter"
+            key_list={filterTags}
+            filterCallback={addOrRemove}
           >
-            <><AddIcon boxSize="10px"/>Add Group</>
-          </Button>
-          </AddGroup>
-          </Box>
-        ) : null}
-      </DragDropContext>
+            <Box>
+              <Icon as={HiFilter} boxSize="20px" />
+              Filter Tags
+            </Box>
+          </LabelEditor>
+
+          <SearchBar placeholder="Search Tasks..." callback={handleChange} />
+        </Stack>
+        <DragDropContext onDragEnd={onDragEnd}>
+          {winReady ? (
+            <Box
+              display="flex"
+              flexDirection="row"
+              width="100%"
+              h="calc(100% - 64px)"
+            >
+              {state
+                ? state.groups.map((el, ind) => (
+                    <TaskGroup
+                      parent={id}
+                      group_key={el}
+                      ind={ind}
+                      key={ind}
+                      search={search}
+                      filter_tags={filterTags}
+                    ></TaskGroup>
+                  ))
+                : null}
+              <AddGroup callback={addGroupEnd}>
+                <Button
+                  height="60px"
+                  m="8px"
+                  bg={"gray.500"}
+                  _hover={{ bg: "gray.600" }}
+                  margin="auto"
+                  display="block"
+                  width="320px"
+                >
+                  <>
+                    <AddIcon boxSize="10px" />
+                    Add Group
+                  </>
+                </Button>
+              </AddGroup>
+            </Box>
+          ) : null}
+        </DragDropContext>
       </>
     );
   }

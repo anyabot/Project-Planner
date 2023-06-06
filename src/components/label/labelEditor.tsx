@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import LabelCreate from "./labelCreate";
 import LabelSwitch from "./labelSwitch";
+import LabelFilter from "./labelFilter";
 
 // Import Redux State
 import {
@@ -21,10 +22,12 @@ import { useDisclosure } from "@chakra-ui/react"
 interface Props {
   children: ReactNode,
   initial_mode: string,
-  task?: string
+  task?: string,
+  key_list?: string[]
+  filterCallback?: (e:string) => void
 }
 
-function LabelEditor({ initial_mode, task, children }: Props) {
+function LabelEditor({ initial_mode, task, children, key_list, filterCallback }: Props) {
   // Redux
   const activeBoard = useAppSelector(selectActiveBoard);
   if (!activeBoard) return null;
@@ -48,16 +51,16 @@ function LabelEditor({ initial_mode, task, children }: Props) {
   function modeSwitch(mode: string) {
     switch (mode) {
       case "create": {
-        console.log("create mode")
         return <LabelCreate onClose={onClose} back={back}/>
       }
       case "modify": {
-        console.log("create mode")
         return <LabelCreate onClose={onClose} back={back} editing_tag={editing_tag}/>
       }
       case "switch": {
-        console.log("create mode")
-        return task ? <LabelSwitch task_key={task} onClose={onClose} changeMode={changeMode} changeEditing={changeEditing}/> : null
+        return task ? <LabelSwitch task_key={task} changeMode={changeMode} changeEditing={changeEditing}/> : null
+      }
+      case "filter": {
+        return key_list && filterCallback ? <LabelFilter key_list={key_list} changeMode={changeMode} changeEditing={changeEditing} callback={filterCallback}/> : null
       }
     }
   }

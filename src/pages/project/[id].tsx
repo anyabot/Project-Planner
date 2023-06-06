@@ -44,7 +44,7 @@ export default function Home() {
       <Head>
         <title>{projects[activeProject].name}</title>
       </Head>
-      <Center flexDirection="column">
+      <Center flexDirection="column" h="100%">
         <Icon as={BsHandIndex} boxSize="100px" />
         <Text fontSize="50px">Select or Create a Board</Text>
       </Center>

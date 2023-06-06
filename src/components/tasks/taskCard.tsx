@@ -25,15 +25,17 @@ import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 //Import Hooks 
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { useState } from "react";
+import { filter } from "lodash";
 
 // TS type for prop
 interface Props {
   group_key: string;
   task_key: string;
   search?: string
+  filter_tags?: string[]
 }
 
-function TaskCard({ group_key, task_key, search }: Props) {
+function TaskCard({ group_key, task_key, search, filter_tags }: Props) {
   // Redux 
   const dispatch = useAppDispatch();
   const boards = useAppSelector(selectBoards);
@@ -55,9 +57,18 @@ function TaskCard({ group_key, task_key, search }: Props) {
   const getLineThrough = (b: boolean) => {
     return b ? "" : "line-through"
   }
+  function getVisible() {
+    if (search) {
+      if (!task.name.toLowerCase().includes(search.toLowerCase())) return "none"
+    }
+    if (filter_tags?.length) {
+      if (task.tags.every(r=> filter_tags.indexOf(r) < 0)) return "none"
+    }
+    return ""
+  }
   if (!task) return null
   return (
-    <Box m="auto" p="2px" display={search ? task.name.toLowerCase().includes(search.toLowerCase()) ? "" : "none" : ""}>
+    <Box m="auto" p="2px" display={getVisible()}>
       <Card m="2" _hover={{ color: "blue" }}  onClick={modal} cursor="pointer">
         {task.tags.length ? (
           <CardHeader display="flex" flexDirection="row" p="2">

@@ -18,6 +18,7 @@ interface Props {
 export default function SearchBar({ placeholder, callback }: Props) {
   return (
     <InputGroup
+      mt="0px !important"
       borderRadius={5}
       borderColor="blackAlpha.500"
       size="sm"
