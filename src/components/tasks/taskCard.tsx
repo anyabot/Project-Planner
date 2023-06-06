@@ -30,9 +30,10 @@ import { useState } from "react";
 interface Props {
   group_key: string;
   task_key: string;
+  search?: string
 }
 
-function TaskCard({ group_key, task_key }: Props) {
+function TaskCard({ group_key, task_key, search }: Props) {
   // Redux 
   const dispatch = useAppDispatch();
   const boards = useAppSelector(selectBoards);
@@ -56,7 +57,7 @@ function TaskCard({ group_key, task_key }: Props) {
   }
   if (!task) return null
   return (
-    <Box m="auto">
+    <Box m="auto" p="2px" display={search ? task.name.toLowerCase().includes(search.toLowerCase()) ? "" : "none" : ""}>
       <Card m="2" _hover={{ color: "blue" }}  onClick={modal} cursor="pointer">
         {task.tags.length ? (
           <CardHeader display="flex" flexDirection="row" p="2">

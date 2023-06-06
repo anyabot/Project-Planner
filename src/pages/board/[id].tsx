@@ -1,5 +1,7 @@
 import dynamic from "next/dynamic";
 import { Board, Group } from "@/interfaces/task";
+import { debounce } from 'lodash';
+import { FormEvent } from "react";
 
 //Import Conponents
 import {
@@ -7,10 +9,12 @@ import {
   DropResult,
   DraggableLocation,
 } from "react-beautiful-dnd";
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Stack,  } from "@chakra-ui/react";
 const TaskGroup = dynamic(import("@/components/tasks/taskGroup"));
 import AddGroup from "@/components/tasks/addGroup";
+import SearchBar from "@/components/utils/searchBar";
 import Error from "next/error";
+import Head from "next/head";
 
 // Import Redux States
 import { selectGroups, setTasks } from "@/store/groupSlice";
@@ -28,7 +32,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useQuickModify } from "@/utils"
 
 //Import Icons
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, Search2Icon } from "@chakra-ui/icons";
 
 const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
@@ -70,6 +74,7 @@ export default function Home() {
   const [id, setId] = useState("");
   const [winReady, setwinReady] = useState(false);
   const [state, setState] = useState<Board>();
+  const [search, setSearch] = useState("");
 
   // Use Effects
   useEffect(() => {
@@ -111,13 +116,17 @@ export default function Home() {
     }
   }
 
+  const handleChange = debounce((e: FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLTextAreaElement;
+    setSearch(target.value);
+  },
+  300)
+
   const {newGroupAt} = useQuickModify()
 
   const addGroupEnd = useCallback( (name: string, color: string) =>  {
     activeBoard ? newGroupAt(activeBoard, boards[activeBoard].groups.length, name, color) : null
   }, [boards, activeBoard])
-
-
 
   if (router.isReady) {
     if (!activeBoard || !(activeBoard in boards))
@@ -128,9 +137,16 @@ export default function Home() {
       );
 
     return (
+      <>
+      <Head>
+        <title>{boards[activeBoard].name}</title>
+      </Head>
+      <Stack flexDirection="row" m={4}>
+        <SearchBar placeholder="Search Tasks..." callback={handleChange} />
+      </Stack>
       <DragDropContext onDragEnd={onDragEnd}>
         {winReady ? (
-          <Box display="flex" flexDirection="row" width="100%">
+          <Box display="flex" flexDirection="row" width="100%" h="calc(100% - 64px)">
             {state
               ? state.groups.map((el, ind) => (
                   <TaskGroup
@@ -138,6 +154,7 @@ export default function Home() {
                     group_key={el}
                     ind={ind}
                     key={ind}
+                    search={search}
                   ></TaskGroup>
                 ))
               : null}
@@ -155,6 +172,7 @@ export default function Home() {
           </Box>
         ) : null}
       </DragDropContext>
+      </>
     );
   }
 }

@@ -22,10 +22,12 @@ import {
   Tooltip,
   Stack,
   Button,
+  ModalFooter,
 } from "@chakra-ui/react";
 import SubtaskCheckBox from "../tasks/subtaskCheckbox";
 import OpenInput from "../utils/openInput";
 import LabelEditor from "../label/labelEditor";
+import PopoverDelete from "../utils/popoverDelete";
 const SimpleMDE = dynamic(
 	() => import("react-simplemde-editor"),
 	{ ssr: false }
@@ -52,7 +54,7 @@ import { CheckIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 import { useEffect, useState, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { useDisclosure } from "@chakra-ui/react";
-import { errorMonitor } from "events";
+import { useQuickModify } from "@/utils"
 
 export default function TaskModal() {
   // Redux
@@ -77,7 +79,7 @@ export default function TaskModal() {
       spellChecker: false,
     };
   }, []);
-
+  const { deleteTask } = useQuickModify()
 
   const activeBoard = useAppSelector(selectActiveBoard);
   if (!activeBoard) return null;
@@ -207,6 +209,14 @@ export default function TaskModal() {
             </Stack>
           </ModalSection>
         </ModalBody>
+        <ModalFooter>
+        <PopoverDelete obj="Task" deleteCallback={() => {
+          deleteTask(task.parent, task_key)
+          hide()
+        }} deleteWarning={`Are you sure you want to delete this task?\nThis action is irrevesible!`}>
+                  <Button colorScheme="red">{`Delete Task`}</Button>
+                </PopoverDelete>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   ) : null;

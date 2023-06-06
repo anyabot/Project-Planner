@@ -1,5 +1,6 @@
 export interface Task {
   name: string;
+  parent: string;
   description: string;
   subtasks: [string, boolean][];
   tags: string[];
@@ -7,6 +8,7 @@ export interface Task {
 
 export interface Group {
   name: string;
+  parent: string;
   color: string;
   tasks: string[];
 }

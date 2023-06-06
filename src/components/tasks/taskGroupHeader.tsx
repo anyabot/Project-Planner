@@ -1,6 +1,3 @@
-import { getDate } from "@/utils";
-import { Droppable, Draggable } from "react-beautiful-dnd";
-
 //Import Components
 import {
   Box,
@@ -23,6 +20,7 @@ import {
   ButtonGroup,
 } from "@chakra-ui/react";
 import ColorPicker from "../utils/colorPicker";
+import PopoverDelete from "../utils/popoverDelete";
 
 // Import Icons
 import { DeleteIcon, Icon } from "@chakra-ui/icons";
@@ -128,10 +126,10 @@ function TaskGroupHeader({ group_key }: Props) {
           </PopoverContent>
         </Portal>
       </Popover>
-      <Popover>
-        <Tooltip label="Delete Group">
+      <PopoverDelete obj="Group" deleteCallback={() => deleteGroup(activeBoard, group_key)} deleteWarning={`Are you sure you want to delete this group?\nThis action is irrevesible!`}>
+
           <Box visibility={isHovering ? "visible" : "hidden"}>
-            <PopoverTrigger>
+          <Tooltip label="Delete Group">
               <DeleteIcon
                 color="white"
                 cursor="pointer"
@@ -139,27 +137,9 @@ function TaskGroupHeader({ group_key }: Props) {
                 m={2}
                 _hover={{ color: "gray.100" }}
               />
-            </PopoverTrigger>
-          </Box>
         </Tooltip>
-        <Portal>
-          <PopoverContent color="black">
-            <PopoverArrow />
-            <PopoverHeader fontWeight="semibold">Delete Group</PopoverHeader>
-            <PopoverCloseButton />
-            <PopoverBody>
-              Are you sure you want to delete this group?
-              <br />
-              This action is irrevesible!
-            </PopoverBody>
-            <PopoverFooter display="flex" justifyContent="flex-end">
-              <ButtonGroup size="sm">
-                <Button colorScheme="red" onClick={() => deleteGroup(group_key)}>Delete</Button>
-              </ButtonGroup>
-            </PopoverFooter>
-          </PopoverContent>
-        </Portal>
-      </Popover>
+          </Box>
+      </PopoverDelete>
     </Heading>
   );
 }

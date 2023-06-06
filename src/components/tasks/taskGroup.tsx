@@ -30,12 +30,13 @@ interface Props {
   parent: string;
   group_key: string;
   ind: number;
+  search?: string
 }
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: "none",
-  padding: grid / 2,
+  padding: 0,
 
   // styles we need to apply on draggables
   ...draggableStyle,
@@ -43,7 +44,7 @@ const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
 
 const grid = 8;
 
-function TaskGroup({ parent, group_key, ind }: Props) {
+function TaskGroup({ parent, group_key, ind, search }: Props) {
   // Redux
   const boards = useAppSelector(selectBoards);
   const activeBoard = useAppSelector(selectActiveBoard);
@@ -127,7 +128,7 @@ function TaskGroup({ parent, group_key, ind }: Props) {
                               provided.draggableProps.style
                             )}
                           >
-                            <TaskCard group_key={group_key} task_key={item} />
+                            <TaskCard group_key={group_key} task_key={item} search={search}/>
                           </div>
                         )}
                       </Draggable>

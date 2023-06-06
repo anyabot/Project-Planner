@@ -18,7 +18,7 @@ import {
   Tooltip,
   Portal,
 } from "@chakra-ui/react";
-import Link from "next/link";
+import PopoverEdit from "../utils/popoverEdit";
 
 // Import Redux State
 import {
@@ -48,158 +48,70 @@ function EditBoard({ parent, board, children }: Props) {
   // Redux
   const dispatch = useAppDispatch();
   const activeBoard = useAppSelector(selectActiveBoard);
+  const boards = useAppSelector(selectBoards);
 
-  const [boardName, setBoardName] = useState("");
-  const { onOpen, onClose, isOpen } = useDisclosure();
   const router = useRouter();
 
   const { newBoard, deleteBoard } = useQuickModify();
 
-  const editBoard = function () {
-    boardName && board ? dispatch(renameBoard([board, boardName])) : null;
-    setBoardName("");
+  const editBoard = function (e: string) {
+    e && board ? dispatch(renameBoard([board, e])) : null;
   };
-  const createBoard = function () {
-    boardName ? newBoard(parent, boardName) : null;
-    setBoardName("");
+  const createBoard = function (e: string) {
+    if (!e) return;
+    const name = newBoard(parent, e);
+    router.push(`/board/${name}`);
   };
   const deleteBoardandMove = function () {
     if (!board) return;
-    router.push(`/project/${parent}`);
+    if (board == activeBoard) router.push(`/project/${parent}`);
     deleteBoard(board);
   };
   return (
-    <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
-      <Box m={0}>
-        <Box
-          flex="initial"
-          position="relative"
-          bg={activeBoard && activeBoard == board ? "gray.600" : ""}
-          borderTopRadius="5px"
-          _hover={{
-            bg: "gray.500",
-          }}
-        >
-          {children ? (
+    <Box m={0}>
+      <Box
+        flex="initial"
+        position="relative"
+        bg={activeBoard && activeBoard == board ? "gray.600" : ""}
+        borderTopRadius="5px"
+        _hover={{
+          bg: "gray.500",
+        }}
+      >
+        {children ? (
+          <>
+            {children}
+            <PopoverEdit
+              mode="edit"
+              obj="Board"
+              editCallback={editBoard}
+              deleteCallback={deleteBoardandMove}
+              initial={(board && boards[board].name) || ""}
+              deleteWarning={`Are you sure you want to delete this Board?\nAll Groups and Tasks from this Board will be removed.\nThis action is irrevesible!`}
+            >
+              <Tooltip label="Edit Board">
+                <Box position="absolute" top="6px" right="2px">
+                  <Icon as={HiPencil} boxSize="20px" m={1} cursor="pointer" />
+                </Box>
+              </Tooltip>
+            </PopoverEdit>
+          </>
+        ) : (
+          <PopoverEdit mode="create" obj="Board" createCallback={createBoard}>
             <>
-              {children}
-              <PopoverTrigger>
-                <Tooltip label="Edit Board">
-                  <Box
-                    position="absolute"
-                    top="6px"
-                    right="2px"
-                    onClick={onOpen}
-                  >
-                    <Icon as={HiPencil} boxSize="20px" m={1} cursor="pointer" />
-                  </Box>
-                </Tooltip>
-              </PopoverTrigger>
-            </>
-          ) : (
-
-              <PopoverTrigger>
-                <Box                     onClick={onOpen}>
               <Box className="tabLink" fontWeight="semibold">
                 New
               </Box>
-                <Tooltip label="New Board">
-                  <Box
-                    position="absolute"
-                    top="6px"
-                    right="2px"
-
-                  >
-                    <AddIcon boxSize="20px" m={1} cursor="pointer" />
-                  </Box>
-                </Tooltip>
+              <Tooltip label="New Board">
+                <Box position="absolute" top="6px" right="2px">
+                  <AddIcon boxSize="20px" m={1} cursor="pointer" />
                 </Box>
-              </PopoverTrigger>
-          )}
-        </Box>
+              </Tooltip>
+            </>
+          </PopoverEdit>
+        )}
       </Box>
-      <Portal>
-        <PopoverContent color="black">
-          <PopoverArrow />
-          <PopoverHeader fontWeight="semibold">
-            {children ? "Edit Board" : "New Board"}
-          </PopoverHeader>
-          <PopoverCloseButton />
-          <PopoverBody>
-            <Text fontSize="12px" mb="6px">
-              Board Name
-            </Text>
-            <Input
-              placeholder="Enter Board Name"
-              value={boardName || ""}
-              onChange={(e) => setBoardName(e.target.value)}
-            />
-          </PopoverBody>
-          <PopoverFooter display="flex" justifyContent="flex-end">
-            <ButtonGroup size="sm">
-              {children ? (
-                <Popover>
-                  <Box>
-                    <PopoverTrigger>
-                      <Button colorScheme="red">Delete Board</Button>
-                    </PopoverTrigger>
-                  </Box>
-                  <PopoverContent color="black">
-                    <PopoverArrow />
-                    <PopoverHeader fontWeight="semibold">
-                      Delete Board
-                    </PopoverHeader>
-                    <PopoverCloseButton />
-                    <PopoverBody>
-                      Are you sure you want to delete this tag?
-                      <br />
-                      All Groups and Tasks from this Board will be removed.
-                      <br />
-                      This action is irrevesible!
-                      <br />
-                    </PopoverBody>
-                    <PopoverFooter display="flex" justifyContent="flex-end">
-                      <ButtonGroup size="sm">
-                        <Button
-                          colorScheme="red"
-                          onClick={() => {
-                            deleteBoardandMove();
-                            onClose();
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </ButtonGroup>
-                    </PopoverFooter>
-                  </PopoverContent>
-                </Popover>
-              ) : null}
-              {children ? (
-                <Button
-                  colorScheme="blue"
-                  onClick={() => {
-                    editBoard();
-                    onClose();
-                  }}
-                >
-                  Edit Name
-                </Button>
-              ) : (
-                <Button
-                  colorScheme="blue"
-                  onClick={() => {
-                    createBoard();
-                    onClose();
-                  }}
-                >
-                  Create Board
-                </Button>
-              )}
-            </ButtonGroup>
-          </PopoverFooter>
-        </PopoverContent>
-      </Portal>
-    </Popover>
+    </Box>
   );
 }
 

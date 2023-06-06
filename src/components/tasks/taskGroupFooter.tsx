@@ -13,6 +13,7 @@ import {
   Input ,
   ButtonGroup,
 } from "@chakra-ui/react";
+import PopoverEdit from "../utils/popoverEdit";
 
 // Import Icons
 
@@ -54,13 +55,8 @@ function TaskGroupFooter({ group_key }: Props) {
   };
 
   return (
-      <Popover 
-      isOpen={isOpen}
-      onOpen={onOpen}
-      onClose={onClose}
-      placement='top-start'>
-        <PopoverTrigger>
-          <Button
+    <PopoverEdit mode="create" createCallback={addNewItem} obj="Task">
+      <Button
             bg={group.color + ".300"}
             _hover={{ bg: group.color + ".400" }}
             margin="auto"
@@ -69,24 +65,8 @@ function TaskGroupFooter({ group_key }: Props) {
           >
             Add Task
           </Button>
-          </PopoverTrigger>
-        <Portal>
-        <PopoverContent color="black">
-            <PopoverArrow />
-            <PopoverHeader fontWeight="semibold">Add Task</PopoverHeader>
-            <PopoverCloseButton />
-            <PopoverBody>
-            <Input placeholder='Enter Task Name' value={taskName || ""} onChange={(e => setTaskName(e.target.value))}/>
-            </PopoverBody>
-            <PopoverFooter display="flex" justifyContent="flex-end">
-              <ButtonGroup size="sm">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button colorScheme="red" onClick={() => addNewItem(taskName)}>Add Task</Button>
-              </ButtonGroup>
-            </PopoverFooter>
-          </PopoverContent>
-        </Portal>
-      </Popover>
+    </PopoverEdit>
+      
   );
 }
 

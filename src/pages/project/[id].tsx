@@ -1,5 +1,7 @@
 // Import Components
 import { Text, Center } from "@chakra-ui/react";
+import Error from "next/error";
+import Head from "next/head";
 
 // Import Redux States
 import {
@@ -14,7 +16,7 @@ import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 
 // Import Icons
-import { BsHandIndex } from "react-icons/bs"
+import { BsHandIndex } from "react-icons/bs";
 import { Icon } from "@chakra-ui/react";
 
 export default function Home() {
@@ -31,12 +33,21 @@ export default function Home() {
     setId(temp);
     if (temp in projects) dispatch(setActiveProject(temp));
   }, [router.isReady, router.query.id]);
+  if (!activeProject || !(activeProject in projects))
   return (
-    <Center flexDirection="column">
-      <Icon as={BsHandIndex} boxSize="100px"/>
-    <Text fontSize="50px">
-      Select or Create a Board
-    </Text>
-    </Center>
+    <>
+      <Error statusCode={404} />
+    </>
+  );
+  return (
+    <>
+      <Head>
+        <title>{projects[activeProject].name}</title>
+      </Head>
+      <Center flexDirection="column">
+        <Icon as={BsHandIndex} boxSize="100px" />
+        <Text fontSize="50px">Select or Create a Board</Text>
+      </Center>
+    </>
   );
 }

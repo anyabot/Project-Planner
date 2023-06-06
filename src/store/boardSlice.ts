@@ -19,6 +19,7 @@ const initialState: Boards = {
     }  },
     "empty_board_1": { name: "Empty Board", parent: "sample", groups: [], tags: {} },
     "empty_board_2": { name: "Empty Board", parent: "empty", groups: [], tags: {}  },
+    "long_board": { name: "Board With a Very Very Very Very Very Long Name", parent: "sample", groups: [], tags: {} },
   },
 };
 
@@ -61,7 +62,7 @@ export const BoardSlice = createSlice({
       if (action.payload[0] in state.boards) {
         let temp = state.boards[action.payload[0]].groups
         let ind = temp.indexOf(action.payload[1])
-        temp.splice(ind)
+        temp.splice(ind, 1)
       }
       
     },

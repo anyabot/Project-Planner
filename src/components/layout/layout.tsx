@@ -23,7 +23,7 @@ export default function Layout({children}: Props) {
       <Navbar />
       <TaskModal/>
       <Container w="100%" minW="100%" minH="100%" p={0} display="flex" flexDirection="row" height={activeProject ? "calc(100vh - 82px)" : "calc(100vh - 62px)"}>
-        <Box w="100%" height="100%" overflow="scroll"   className='scroller fill' bg="gray.300">
+        <Box w="100%" height="100%" overflow="scroll"   className='scroller' bg="gray.300">
           {children}
           </Box>
         </Container>

@@ -16,7 +16,6 @@ import {
   selectActiveBoard,
   removeGroupFromBoard,
   removeBoard,
-  addGroupToBoard,
   addGroupToBoardAt,
   addTag,
   removeTag,
@@ -24,34 +23,36 @@ import {
 } from "./store/boardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import { StringMappingType } from "typescript";
-import { addBoardToProject } from "./store/projectSlice";
+import { addBoardToProject, addProject, selectProjects, removeProject } from "./store/projectSlice";
 
 const useQuickModify = () => {
   const dispatch = useDispatch();
   const groups = useSelector(selectGroups);
   const boards = useSelector(selectBoards);
+  const projects = useSelector(selectProjects);
   const tasks = useSelector(selectTasks);
   const activeBoard = useSelector(selectActiveBoard);
   function newTask(group: string, name: string) {
     let taskId = "task_" + getDate();
-    dispatch(addTask([taskId, name]));
+    dispatch(addTask([group, taskId, name]));
     dispatch(addTaskToGroup([group, taskId]));
   }
-  function deleteTask(task: string) {
+  function deleteTask(group:string, task: string) {
     dispatch(removeTask(task));
+    dispatch(removeTaskFromGroup([group, task]))
   }
   function newGroupAt(board: string, ind: number, name: string, color: string) {
     let groupId = "group_" + getDate();
     dispatch(addGroupToBoardAt([board, groupId, ind]));
-    dispatch(addGroup([groupId, name, color]));
+    dispatch(addGroup([board, groupId, name, color]));
   }
-  function deleteGroup(group: string) {
+  function deleteGroup(board: string, group: string) {
     if (group in groups) {
       groups[group].tasks.forEach((task) => {
-        deleteTask(task);
+        deleteTask(group, task);
       });
       dispatch(removeGroup(group));
+      dispatch(removeGroupFromBoard([board, group]))
     }
   }
   function newBoard(project: string, name: string) {
@@ -63,9 +64,22 @@ const useQuickModify = () => {
   function deleteBoard(board: string) {
     if (board in boards) {
       boards[board].groups.forEach((group) => {
-        deleteTask(group);
+        deleteTask(board, group);
       });
       dispatch(removeBoard(board));
+    }
+  }
+  function newProject(name: string) {
+    let projectId = "project_" + getDate();
+    dispatch(addProject([projectId, name]));
+    return projectId;
+  }
+  function deleteProject(project: string) {
+    if (project in projects) {
+      projects[project].boards.forEach((board) => {
+        deleteTask(project, board);
+      });
+      dispatch(removeProject(project));
     }
   }
   function newTag(board: string, tag: string, color: string) {
@@ -92,7 +106,9 @@ const useQuickModify = () => {
       newGroupAt,
       newTag,
       deleteTag,
-      newBoard
+      newBoard,
+      newProject,
+      deleteProject
     }),
     [dispatch]
   );

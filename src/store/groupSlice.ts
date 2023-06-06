@@ -8,6 +8,7 @@ export interface Groups {
 const initialState: Groups = {
   "sample_group_1": {
     name: "To Do",
+    parent: "sample_board_1",
     color: "red",
     tasks: [
       "task_1"
@@ -15,6 +16,7 @@ const initialState: Groups = {
   },
   "sample_group_2": {
     name: "Doing",
+    parent: "sample_board_1",
     color: "green",
     tasks: [
       "task_2"
@@ -22,6 +24,7 @@ const initialState: Groups = {
   },
   "sample_group_3": {
     name: "Done",
+    parent: "sample_board_1",
     color: "blue",
     tasks: [
       "task_3",
@@ -30,6 +33,7 @@ const initialState: Groups = {
   },
   "unneeded_group": {
     name: "Uneeded",
+    parent: "sample_board_1",
     color: "teal",
     tasks: [
       "uneeded_1",
@@ -54,10 +58,11 @@ export const GroupSlice = createSlice({
     setGroup: (state, action: PayloadAction<[string, Group]>) => {
       action.payload[0] in state ? state[action.payload[0]] = action.payload[1] : null
     },
-    addGroup: (state, action: PayloadAction<[string, string, string]>) => {
-      state[action.payload[0]] = {
-          name: action.payload[1],
-          color: action.payload[2],
+    addGroup: (state, action: PayloadAction<[string, string, string, string]>) => {
+      state[action.payload[1]] = {
+          name: action.payload[2],
+          parent: action.payload[0],
+          color: action.payload[3],
           tasks: [
           ],
       }
@@ -76,10 +81,11 @@ export const GroupSlice = createSlice({
       action.payload[0] in state ? state[action.payload[0]].color = action.payload[1] : null
     },
     removeTaskFromGroup: (state, action: PayloadAction<[string, string]>) => {
-      if (action.payload[0] in state.boards) {
+      if (action.payload[0] in state) {
         let temp = state[action.payload[0]].tasks
         let ind = temp.indexOf(action.payload[1])
-        temp.splice(ind)
+        temp.splice(ind, 1)
+        state[action.payload[0]].tasks = temp
       }
     },
   },

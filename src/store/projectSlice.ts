@@ -15,7 +15,7 @@ export interface Projects {
 const initialState: Projects = {
   active: null,
   projects: {
-    "sample": { name: "Sample Project", boards: ["board_1", "empty_board_1"] },
+    "sample": { name: "Sample Project", boards: ["board_1", "empty_board_1", "long_board"] },
     "empty": { name: "Empty Project", boards: ["empty_board_2"] },
   },
 };
@@ -28,13 +28,16 @@ export const ProjectSlice = createSlice({
     setActiveProject: (state, action: PayloadAction<string | null>) => {
       state.active = action.payload;
     },
-    addProject: (state) => {
-      let temp = "project_" + getDate()
-      state.projects[temp] = { name: "New Project", boards: [""] }
-      state.active = temp
+    addProject: (state, action: PayloadAction<[string, string]>) => {
+      state.projects[action.payload[0]] = { name: action.payload[1], boards: [""] }
+      // state.active = temp
     },
     renameProject: (state, action: PayloadAction<[string, string]>) => {
       action.payload[0] in state.projects ? state.projects[action.payload[0]].name = action.payload[1] : null
+    },
+    removeProject: (state, action: PayloadAction<string>) => {
+      delete state.projects[action.payload]
+      if (action.payload === state.active) state.active = null
     },
     addBoardToProject: (state, action: PayloadAction<[string, string]>) => {
       action.payload[0] in state.projects ? null : state.projects[action.payload[0]].boards.push(action.payload[1])
@@ -45,7 +48,6 @@ export const ProjectSlice = createSlice({
         let ind = temp.indexOf(action.payload[1])
         temp.splice(ind)
       }
-      
     }
   },
   // The `extraReducers` field lets the slice handle actions defined elsewhere,
@@ -57,6 +59,8 @@ export const {
   addProject,
   addBoardToProject,
   removeBoardFromProject,
+  renameProject,
+  removeProject
 } = ProjectSlice.actions;
 export const selectProjects = (state: RootState) => state.projects.projects;
 export const selectActiveProject = (state: RootState) => state.projects.active;
