@@ -32,6 +32,8 @@ interface Props {
   ind: number;
   search?: string;
   filter_tags?: string[]
+  filter_members?: string[];
+  canEdit: boolean
 }
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
@@ -45,7 +47,7 @@ const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
 
 const grid = 8;
 
-function TaskGroup({ parent, group_key, ind, search, filter_tags }: Props) {
+function TaskGroup({ parent, group_key, ind, search, filter_tags, filter_members, canEdit }: Props) {
   // Redux
   const boards = useAppSelector(selectBoards);
   const activeBoard = useAppSelector(selectActiveBoard);
@@ -100,7 +102,7 @@ function TaskGroup({ parent, group_key, ind, search, filter_tags }: Props) {
       </AddGroup>
       <Box minW="320px" maxWidth="320px" height="100%">
         <Box height="100%" backgroundColor={group.color + ".300"}>
-          <TaskGroupHeader group_key={group_key} key={group_key} />
+          <TaskGroupHeader group_key={group_key} key={group_key} canEdit={canEdit}/>
 
           <Droppable droppableId={`${ind}`}>
             {(provided, snapshot) => (
@@ -129,7 +131,7 @@ function TaskGroup({ parent, group_key, ind, search, filter_tags }: Props) {
                               provided.draggableProps.style
                             )}
                           >
-                            <TaskCard group_key={group_key} task_key={item} search={search} filter_tags={filter_tags}/>
+                            <TaskCard group_key={group_key} task_key={item} search={search} filter_tags={filter_tags} filter_members={filter_members}/>
                           </div>
                         )}
                       </Draggable>
@@ -140,7 +142,7 @@ function TaskGroup({ parent, group_key, ind, search, filter_tags }: Props) {
               </Box>
             )}
           </Droppable>
-          <TaskGroupFooter group_key={group_key}/>
+          <TaskGroupFooter group_key={group_key} canEdit={canEdit}/>
         </Box>
       </Box>
     </Box>

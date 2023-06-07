@@ -3,7 +3,6 @@ import {
   Box,
   Heading,
   Circle,
-  Button,
   Editable,
   EditableInput,
   EditablePreview,
@@ -11,13 +10,8 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  PopoverFooter,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverHeader,
   Portal,
   Tooltip,
-  ButtonGroup,
 } from "@chakra-ui/react";
 import ColorPicker from "../utils/colorPicker";
 import PopoverDelete from "../utils/popoverDelete";
@@ -44,9 +38,10 @@ import { useDisclosure } from "@chakra-ui/react";
 // TS type for prop
 interface Props {
   group_key: string;
+  canEdit: boolean
 }
 
-function TaskGroupHeader({ group_key }: Props) {
+function TaskGroupHeader({ group_key, canEdit }: Props) {
   // Redux
   const dispatch = useAppDispatch();
   const activeBoard = useAppSelector(selectActiveBoard);
@@ -90,9 +85,7 @@ function TaskGroupHeader({ group_key }: Props) {
       <Editable
         defaultValue={group.name}
         width="100%"
-        overflow="hidden"
-        textOverflow="ellipsis"
-        whiteSpace="nowrap"
+        className="clipText"
       >
         <Tooltip label="Click to edit" shouldWrapChildren={true}>
           <EditablePreview />

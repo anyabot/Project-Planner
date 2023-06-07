@@ -3,9 +3,10 @@ import {
   Box,
   Button,
   useOutsideClick,
-  Input,
-  FormControl,
+  Textarea,
+  FormControl
 } from "@chakra-ui/react";
+import reactTextareaAutosize from "react-textarea-autosize";
 
 //Import Hooks
 import React, { useRef, useState, ReactNode } from "react";
@@ -17,20 +18,13 @@ interface Props {
   children: ReactNode;
 }
 
-export default function OpenInput({ placeholder, callback, children }: Props) {
+export default function OpenComment({ placeholder, callback, children }: Props) {
   const [isEditing, setisEditing] = useState(false);
   const [message, setMessage] = useState("");
   const ref = useRef(null);
-  useOutsideClick({
-    ref: ref,
-    handler: () => {
-      setMessage("");
-      setisEditing(false);
-    },
-  });
   return isEditing ? (
     <FormControl ref={ref}>
-      <Input
+      <Textarea
         py={2}
         px={4}
         placeholder={placeholder}
@@ -39,6 +33,7 @@ export default function OpenInput({ placeholder, callback, children }: Props) {
         value={message}
         onSubmit={() => setMessage("")}
         autoFocus={true}
+        as={reactTextareaAutosize}
       />
       <Button colorScheme="green"
         onClick={() => {

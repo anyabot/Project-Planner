@@ -3,6 +3,7 @@ import taskSlice, {
   removeTask,
   addTask,
   deleteTagFromTask,
+  deleteMemberFromTask,
 } from "./store/taskSlice";
 import {
   selectGroups,
@@ -20,10 +21,12 @@ import {
   addTag,
   removeTag,
   addBoard,
+  removeMemberFromBoard,
 } from "./store/boardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
 import { addBoardToProject, addProject, selectProjects, removeProject } from "./store/projectSlice";
+import { selectCurrentUser } from "./store/stateSlice";
 
 const useQuickModify = () => {
   const dispatch = useDispatch();
@@ -31,6 +34,7 @@ const useQuickModify = () => {
   const boards = useSelector(selectBoards);
   const projects = useSelector(selectProjects);
   const tasks = useSelector(selectTasks);
+  const current_user = useSelector(selectCurrentUser);
   const activeBoard = useSelector(selectActiveBoard);
   function newTask(group: string, name: string) {
     let taskId = "task_" + getDate();
@@ -58,7 +62,7 @@ const useQuickModify = () => {
   function newBoard(project: string, name: string) {
     let boardId = "board_" + getDate();
     dispatch(addBoardToProject([project, boardId]));
-    dispatch(addBoard([boardId, name, project]));
+    dispatch(addBoard([boardId, name, project, current_user]));
     return boardId;
   }
   function deleteBoard(board: string) {
@@ -87,13 +91,22 @@ const useQuickModify = () => {
     dispatch(addTag([board, tagId, tag, color]));
   }
   function deleteTag(tag: string) {
-
     if (!activeBoard) return;
     let board = boards[activeBoard];
     dispatch(removeTag([activeBoard, tag]));
     board.groups.forEach((group) => {
       groups[group].tasks.forEach((task) => {
         dispatch(deleteTagFromTask([task, tag]));
+      });
+    });
+  }
+  function deleteMember(member: string) {
+    if (!activeBoard) return;
+    let board = boards[activeBoard];
+    dispatch(removeMemberFromBoard([activeBoard, member]));
+    board.groups.forEach((group) => {
+      groups[group].tasks.forEach((task) => {
+        dispatch(deleteMemberFromTask([task, member]));
       });
     });
   }
@@ -108,7 +121,8 @@ const useQuickModify = () => {
       deleteTag,
       newBoard,
       newProject,
-      deleteProject
+      deleteProject,
+      deleteMember
     }),
     [dispatch]
   );

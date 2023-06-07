@@ -130,3 +130,27 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.modalSubsection {
+  display: inline-block;
+  vertical-align: top;
+  line-height: 40px;
+  margin: 0 8px
+}
+.modalSubsection > span {
+  line-height: normal;
+}
+
+.clipText {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.calendar-noborder {
+  border: none !important;
+}
+
+.markdown-body {
+  background-color: inherit !important;
+}

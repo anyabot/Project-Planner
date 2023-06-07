@@ -11,7 +11,9 @@ const initialState: Groups = {
     parent: "sample_board_1",
     color: "red",
     tasks: [
-      "task_1"
+      "task_1",
+      "long",
+      "due"
     ],
   },
   "sample_group_2": {
@@ -19,7 +21,9 @@ const initialState: Groups = {
     parent: "sample_board_1",
     color: "green",
     tasks: [
-      "task_2"
+      "task_2",
+      "members",
+      "comment"
     ],
   },
   "sample_group_3": {

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Box, Text } from "@chakra-ui/react";
 
-import { QuestionOutlineIcon, HamburgerIcon, Icon } from "@chakra-ui/icons";
+import { QuestionOutlineIcon, HamburgerIcon, Icon, ChatIcon } from "@chakra-ui/icons";
 import { HiTag, HiOutlineCheckCircle } from "react-icons/hi";
 
 const iconSwitch = (icon: string) => {
@@ -35,6 +35,15 @@ const iconSwitch = (icon: string) => {
           as={HiOutlineCheckCircle}
         />
       );
+      case "comment":
+        return (
+          <ChatIcon
+            position="absolute"
+            left="-30px"
+            top="8px"
+            boxSize="25px"
+          />
+        );
     default:
       return (
         <QuestionOutlineIcon

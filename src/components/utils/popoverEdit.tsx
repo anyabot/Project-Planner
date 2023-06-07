@@ -21,7 +21,7 @@ import {
 import PopoverDelete from "./popoverDelete";
 
 // Import Hooks
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 
 // TS type for prop
@@ -40,18 +40,18 @@ function PopoverEdit({ mode, obj, children, initial, createCallback, editCallbac
   const [name, setName] = useState(initial || "");
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  const edit = function () {
+  const edit = useCallback(() =>  {
     name && editCallback ? editCallback(name) : null
     onClose()
-  };
-  const create = function () {
+  }, [editCallback]);
+  const create = useCallback(() =>  {
     name && createCallback ? createCallback(name) : null
     onClose()
-  };
-  const deleteObj = function () {
+  }, [createCallback]);
+  const deleteObj = useCallback(() =>  {
     deleteCallback ? deleteCallback() : null
     onClose()
-  };
+  }, [deleteCallback]);
   return (
     <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
       <PopoverTrigger>

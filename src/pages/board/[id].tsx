@@ -9,11 +9,21 @@ import {
   DropResult,
   DraggableLocation,
 } from "react-beautiful-dnd";
-import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Stack,
+  Flex,
+  AvatarGroup,
+  Avatar,
+} from "@chakra-ui/react";
 const TaskGroup = dynamic(import("@/components/tasks/taskGroup"));
 import AddGroup from "@/components/tasks/addGroup";
 import SearchBar from "@/components/utils/searchBar";
 import LabelEditor from "@/components/label/labelEditor";
+import MemberSwitch from "@/components/member/memberSwitch";
+import UserSwitch from "@/components/member/userSwitch";
+import PopoverDelete from "@/components/utils/popoverDelete";
 import Error from "next/error";
 import Head from "next/head";
 
@@ -24,7 +34,10 @@ import {
   selectBoards,
   selectActiveBoard,
   setActiveBoard,
+  addMemberToBoard,
+  removeMemberFromBoard,
 } from "@/store/boardSlice";
+import { selectUsers, selectCurrentUser } from "@/store/stateSlice";
 
 //Import Hooks
 import { useRouter } from "next/router";
@@ -34,7 +47,7 @@ import { useQuickModify } from "@/utils";
 
 //Import Icons
 import { AddIcon, Icon } from "@chakra-ui/icons";
-import { HiFilter } from "react-icons/hi";
+import { HiFilter, HiUserAdd } from "react-icons/hi";
 
 const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
@@ -71,6 +84,8 @@ export default function Home() {
   const boards = useAppSelector(selectBoards);
   const activeBoard = useAppSelector(selectActiveBoard);
   const groups = useAppSelector(selectGroups);
+  const users = useAppSelector(selectUsers);
+  const curr_user = useAppSelector(selectCurrentUser);
 
   // UseState
   const [id, setId] = useState("");
@@ -78,6 +93,9 @@ export default function Home() {
   const [state, setState] = useState<Board>();
   const [search, setSearch] = useState("");
   const [filterTags, setFilterTags] = useState<string[]>([]);
+  const [filterMembers, setFilterMembers] = useState<string[]>([]);
+  const [members, setMembers] = useState<string[]>([]);
+  const [canEdit, setEdit] = useState(false);
 
   // Use Effects
   useEffect(() => {
@@ -100,6 +118,21 @@ export default function Home() {
         )
       : null;
   }, [state?.tags]);
+  useEffect(() => {
+    state
+      ? setFilterMembers(
+          filterMembers.filter((member) =>
+            state.members.some((e) => e.id === member)
+          )
+        )
+      : null;
+    state ? setMembers(state.members.map((member) => member.id)) : null;
+  }, [state?.members]);
+  useEffect(() => {
+    curr_user && state
+      ? setEdit(state.members.some((m) => m.id == curr_user))
+      : null;
+  }, [curr_user, state]);
 
   //Utility Functions
   const addOrRemove = debounce((e: string) => {
@@ -107,11 +140,29 @@ export default function Home() {
     if (index === -1) {
       setFilterTags([...filterTags, e]);
     } else {
-      const temp = [...filterTags]
-      temp.splice(index, 1)
+      const temp = [...filterTags];
+      temp.splice(index, 1);
       setFilterTags(temp);
     }
-  }, 200)
+  }, 200);
+
+  const addOrRemoveMembers = debounce((e: string) => {
+    var index = filterMembers.indexOf(e);
+    if (index === -1) {
+      setFilterMembers([...filterMembers, e]);
+    } else {
+      const temp = [...filterMembers];
+      temp.splice(index, 1);
+      setFilterMembers(temp);
+    }
+  }, 200);
+  const addMember = (e: string) => {
+    if (!activeBoard) return;
+    var index = members.indexOf(e);
+    if (index === -1) {
+      dispatch(addMemberToBoard([activeBoard, e]));
+    }
+  };
 
   function onDragEnd(result: DropResult) {
     if (!state) return;
@@ -142,7 +193,7 @@ export default function Home() {
     setSearch(target.value);
   }, 300);
 
-  const { newGroupAt } = useQuickModify();
+  const { newGroupAt, deleteMember } = useQuickModify();
 
   const addGroupEnd = useCallback(
     (name: string, color: string) => {
@@ -171,20 +222,66 @@ export default function Home() {
         <Head>
           <title>{boards[activeBoard].name}</title>
         </Head>
-        <Stack flexDirection="row" m={4} alignItems="center" gap={8}>
+        <Flex flexDirection="row" m={4} alignItems="center" gap={8}>
+          {canEdit}
+          <AvatarGroup>
+            {boards[activeBoard].members.map((member, i) =>
+              member.id in users ? (
+                <PopoverDelete
+                  key={member.id}
+                  obj="Member"
+                  deleteCallback={() => deleteMember(member.id)}
+                  deleteWarning={`Are you sure you want to remove this member from the board?\nThey will be removed from all Tasks\nThis action is irrevesible!`}
+                >
+                  <Avatar
+                    size="sm"
+                    mx="-0.25rem"
+                    cursor="pointer"
+                    name={users[member.id].name}
+                    src={users[member.id].avatar}
+                    title={users[member.id].name}
+                    _hover={{ zIndex: 2 }}
+                  />
+                </PopoverDelete>
+              ) : null
+            )}
+            <UserSwitch
+              key_list={members}
+              callback={addMember}
+              text="Edit Members"
+            >
+              <Avatar
+                size="sm"
+                mx="-0.25rem"
+                cursor="pointer"
+                icon={<Icon as={HiUserAdd} boxSize="24px" />}
+                _hover={{ zIndex: 2 }}
+              />
+            </UserSwitch>
+          </AvatarGroup>
           <LabelEditor
             initial_mode="filter"
             key_list={filterTags}
             filterCallback={addOrRemove}
           >
-            <Box>
+            <Box fontWeight="semibold" cursor="pointer">
               <Icon as={HiFilter} boxSize="20px" />
               Filter Tags
             </Box>
           </LabelEditor>
+          <MemberSwitch
+            key_list={filterMembers}
+            callback={addOrRemoveMembers}
+            text="Filter Members"
+          >
+            <Box fontWeight="semibold" cursor="pointer">
+              <Icon as={HiFilter} boxSize="20px" />
+              Filter Members
+            </Box>
+          </MemberSwitch>
 
           <SearchBar placeholder="Search Tasks..." callback={handleChange} />
-        </Stack>
+        </Flex>
         <DragDropContext onDragEnd={onDragEnd}>
           {winReady ? (
             <Box
@@ -202,6 +299,8 @@ export default function Home() {
                       key={ind}
                       search={search}
                       filter_tags={filterTags}
+                      filter_members={filterMembers}
+                      canEdit={canEdit}
                     ></TaskGroup>
                   ))
                 : null}

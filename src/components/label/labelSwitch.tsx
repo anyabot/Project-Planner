@@ -12,6 +12,7 @@ import {
   ButtonGroup,
   Tooltip,
 } from "@chakra-ui/react";
+import Checker from "../utils/checker";
 
 // Import Icons
 import { Icon } from "@chakra-ui/icons";
@@ -58,17 +59,15 @@ function LabelSwitch({ task_key, changeMode, changeEditing }: Props) {
             width="full"
             textAlign="center"
           >
-            <Checkbox
-              isChecked={task.tags.includes(tag)}
-              flex="auto"
-              onChange={() => {
+            <Checker
+              checked={task.tags.includes(tag)}
+              callback={() => {
                 dispatch(toogleTag([task_key, tag]));
               }}
-              bgColor={tags[tag].color + ".200"}
-              colorScheme={tags[tag].color}
+              color={tags[tag].color}
             >
-              {tags[tag].name}
-            </Checkbox>
+              <Box maxW="200px" className="clipText" lineHeight="normal">{tags[tag].name}</Box>
+            </Checker>
             <Box flex="initial">
               <Tooltip label="Edit Tag">
                 <Box>
