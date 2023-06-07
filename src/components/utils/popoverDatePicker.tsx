@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 
-import "react-datepicker/dist/react-datepicker.css";
 import "react-calendar/dist/Calendar.css";
 
 //Import Components
@@ -21,7 +20,6 @@ import {
   Tooltip,
   Portal,
 } from "@chakra-ui/react";
-import PopoverDelete from "./popoverDelete";
 import Calendar from "react-calendar";
 
 // Import Hooks
@@ -52,7 +50,7 @@ function PopoverDatePicker({
   const edit = useCallback(() => {
     date && editCallback ? editCallback(date) : null;
     onClose();
-  }, [editCallback]);
+  }, [editCallback, date]);
   const deleteObj = useCallback(() => {
     deleteCallback ? deleteCallback() : null;
     onClose();

@@ -261,7 +261,7 @@ export default function TaskModal() {
                 }}
               >
                 {task.due ? (
-                  <DateBadge date={task.due} />
+                  <Box><DateBadge date={task.due} /></Box>
                 ) : (
                   <Tag
                     colorScheme="gray"

@@ -95,7 +95,6 @@ export default function Home() {
   const [filterTags, setFilterTags] = useState<string[]>([]);
   const [filterMembers, setFilterMembers] = useState<string[]>([]);
   const [members, setMembers] = useState<string[]>([]);
-  const [canEdit, setEdit] = useState(false);
 
   // Use Effects
   useEffect(() => {
@@ -128,11 +127,6 @@ export default function Home() {
       : null;
     state ? setMembers(state.members.map((member) => member.id)) : null;
   }, [state?.members]);
-  useEffect(() => {
-    curr_user && state
-      ? setEdit(state.members.some((m) => m.id == curr_user))
-      : null;
-  }, [curr_user, state]);
 
   //Utility Functions
   const addOrRemove = debounce((e: string) => {
@@ -223,7 +217,6 @@ export default function Home() {
           <title>{boards[activeBoard].name}</title>
         </Head>
         <Flex flexDirection="row" m={4} alignItems="center" gap={8}>
-          {canEdit}
           <AvatarGroup>
             {boards[activeBoard].members.map((member, i) =>
               member.id in users ? (
@@ -300,7 +293,6 @@ export default function Home() {
                       search={search}
                       filter_tags={filterTags}
                       filter_members={filterMembers}
-                      canEdit={canEdit}
                     ></TaskGroup>
                   ))
                 : null}

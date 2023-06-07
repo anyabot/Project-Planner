@@ -34,10 +34,9 @@ import { useDisclosure } from "@chakra-ui/react"
 // TS type for prop
 interface Props {
   group_key: string;
-  canEdit: boolean
 }
 
-function TaskGroupFooter({ group_key, canEdit }: Props) {
+function TaskGroupFooter({ group_key }: Props) {
   // Redux
   const activeBoard = useAppSelector(selectActiveBoard);
   const groups = useAppSelector(selectGroups);
@@ -56,7 +55,7 @@ function TaskGroupFooter({ group_key, canEdit }: Props) {
   };
 
   return (
-    canEdit ? <PopoverEdit mode="create" createCallback={addNewItem} obj="Task">
+    <PopoverEdit mode="create" createCallback={addNewItem} obj="Task">
       <Button
             bg={group.color + ".300"}
             _hover={{ bg: group.color + ".400" }}
@@ -67,7 +66,6 @@ function TaskGroupFooter({ group_key, canEdit }: Props) {
             Add Task
           </Button>
     </PopoverEdit>
-      : null
   );
 }
 

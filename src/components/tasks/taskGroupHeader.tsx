@@ -38,10 +38,9 @@ import { useDisclosure } from "@chakra-ui/react";
 // TS type for prop
 interface Props {
   group_key: string;
-  canEdit: boolean
 }
 
-function TaskGroupHeader({ group_key, canEdit }: Props) {
+function TaskGroupHeader({ group_key }: Props) {
   // Redux
   const dispatch = useAppDispatch();
   const activeBoard = useAppSelector(selectActiveBoard);
